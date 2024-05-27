@@ -1,0 +1,224 @@
+<div class="d-flex justify-content-between">
+  <div class="serverTable">
+    <form [formGroup]="hostedUssdForm">
+      <mat-form-field appearance="fill">
+        <mat-label>HOSTED USSD URL</mat-label>
+        <textarea
+          matInput
+          type="text"
+          formControlName="url"
+          placeholder="http://127.0.0.1:6900/test2-ussd@0.0.1/?SESSION_ID=xxx&SERVICE_CODE=303&IMSI=xxx&TIMSI=xxx&MOBILE_NUMBER=xxx&USSD_BODY="
+        ></textarea>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="parseUrl()"
+        [disabled]="hostedUssdForm.invalid"
+      >
+        Parse URL
+      </button>
+    </form>
+    <hr />
+
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      class="mat-elevation-z8"
+      *ngIf="hostedUrls$ | async"
+    >
+      <ng-container matColumnDef="protocol">
+        <th mat-header-cell *matHeaderCellDef>protocol</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.protocol }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ip">
+        <th mat-header-cell *matHeaderCellDef>ip</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.urlIP }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="port">
+        <th mat-header-cell *matHeaderCellDef>port</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.urlPort }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td
+          class="actionRow"
+          mat-cell
+          *matCellDef="let element"
+          class="action-link"
+        >
+          <button
+            mat-icon-button
+            matTooltip="add"
+            (click)="populateUssdCode(element)"
+          >
+            <mat-icon class="add">add</mat-icon>
+          </button>
+
+          <button mat-icon-button matTooltip="Edit" (click)="editUrl(element)">
+            <mat-icon class="edit">edit</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            matTooltip="Delete"
+            (click)="deleteUrl(element)"
+          >
+            <mat-icon class="delete">delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <div class="mobile">
+    <div class="phone">
+      <div class="phone-mirror">
+        <div class="topWrapper">
+          <div class="camera"></div>
+          <div class="line-rec"></div>
+        </div>
+        <div class="phoneBody">
+          <form class="postForm" [formGroup]="paramsForm" *ngIf="!loading && !isDialled">
+            <mat-form-field appearance="fill">
+              <mat-label>Engine IP Address</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="engineIp"
+                value="http://"
+              />
+              <small
+                *ngIf="
+                  paramsForm.controls['engineIp'].invalid &&
+                  (paramsForm.controls['engineIp'].dirty ||
+                    paramsForm.controls['engineIp'].touched)
+                "
+                class="formErrors"
+              >
+                <small *ngIf="paramsForm.controls['engineIp'].errors.required">
+                  IP Address is required
+                </small>
+                <!-- <small *ngIf="paramsForm.controls['engineIp'].errors.pattern">
+                    IP Address provided is invalid
+                  </small> -->
+              </small>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Engine Port</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="enginePort"
+                placeholder="6677"
+              />
+              <small
+                *ngIf="
+                  paramsForm.controls['enginePort'].invalid &&
+                  (paramsForm.controls['enginePort'].dirty ||
+                    paramsForm.controls['enginePort'].touched)
+                "
+                class="formErrors"
+              >
+                <small
+                  *ngIf="paramsForm.controls['enginePort'].errors.required"
+                >
+                  Port is required
+                </small>
+              </small>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Selected USSD</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="selectedUssd"
+                placeholder="test-ussd@0.0.1"
+              />
+              <small
+                *ngIf="
+                  paramsForm.controls['selectedUssd'].invalid &&
+                  (paramsForm.controls['selectedUssd'].dirty ||
+                    paramsForm.controls['selectedUssd'].touched)
+                "
+                class="formErrors"
+              >
+                <small
+                  *ngIf="paramsForm.controls['selectedUssd'].errors.required"
+                >
+                  USSD is required
+                </small>
+                <!-- <small
+                    *ngIf="redisConnectForm.controls['phoneNumber'].errors.pattern"
+                  >
+                    Phone Number provided is invalid
+                  </small> -->
+              </small>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Phone Number</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="phoneNumber"
+              />
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="dialUssd()"
+              [disabled]="paramsForm.invalid"
+            >
+              Dial USSD
+            </button>
+          </form>
+
+          <ng-container *ngIf="!loading && postResponse$ | async as resp">
+            <div class="ussdPrompt">
+              <p>
+                {{ resp }}
+              </p>
+
+              <form [formGroup]="paramsForm">
+                <mat-form-field appearance="fill">
+                  <input matInput type="text" formControlName="input" />
+                </mat-form-field>
+
+                <button mat-raised-button color="warn" (click)="cancelUssd()">
+                  Cancel
+                </button>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="dialUssd()"
+                  [disabled]="paramsForm.invalid"
+                >
+                  Send
+                </button>
+              </form>
+            </div>
+          </ng-container>
+
+          <mat-spinner *ngIf="loading">Ussd Code Running</mat-spinner>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

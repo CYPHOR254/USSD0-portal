@@ -1,0 +1,95 @@
+<ng-container *ngIf="allJsonData$ | async">
+  <div class="text-overlay" *ngIf="promptData$ | async">
+    <div class="header">
+      <nz-tag class="tag" [nzColor]="'green'">{{
+        currTestStep ? currTestStep["name"] : "__null__"
+      }}</nz-tag>
+      <div class="back-btn">
+        <i
+          nzTooltipTitle="Close Prompt Testing"
+          nzTooltipPlacement="rightTop"
+          nz-tooltip
+          nz-icon
+          nzType="close-circle"
+          nzTheme="outline"
+          (click)="closePromptTest()"
+        ></i>
+      </div>
+    </div>
+    <ng-container *ngIf="currTestStep && currTestStep['type'] === 'select'">
+      <hr />
+      <div class="testBodyContainer">
+        <ng-container
+          *ngIf="matchingRespFlag === false && !(apiCallStatus$ | async)"
+        >
+          <ng-container *ngIf="currTestStep['type'] === 'select'">
+            <div
+              *ngFor="let option of currTestOptions; let i = index"
+              [ngStyle]="{
+                border: '2px solid black',
+                width: 'fit-content',
+                margin: '3px auto',
+                background: 'white',
+                borderRadius: '8px'
+              }"
+            >
+              <div class="testDisplay">
+                <span>{{ i + 1 }}:</span>
+                <span>
+                  {{
+                    option["labelMsg"] ? option["labelMsg"] : option["label"]
+                  }}</span
+                >
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+
+        <ng-container *ngIf="apiCallStatus$ | async as data">
+          <div
+            *ngFor="let option of currTestOptions; let i = index"
+            [ngStyle]="{
+              border: '2px solid black',
+              width: 'fit-content',
+              margin: '3px auto',
+              background: 'white',
+              borderRadius: '8px'
+            }"
+          >
+            <div class="testDisplay">
+              <span>{{ i + 1 }}:</span>
+              <span>
+                {{
+                  option["labelMsg"] ? option["labelMsg"] : option["label"]
+                }}</span
+              >
+            </div>
+          </div>
+        </ng-container>
+        <!-- <ng-container *ngIf="currTestStep['type'] === 'input'">
+        <div>
+          <div class="testDisplay">This is an input</div>
+        </div>
+      </ng-container> -->
+      </div>
+      <!-- <hr /> -->
+    </ng-container>
+    <footer class="action-footer">
+      <input
+        nz-input
+        placeholder=""
+        nzSize="default"
+        [formControl]="ussdForm.controls.select"
+      />
+      <div class="actions">
+        <a
+          ><span *ngIf="!isFirstStep" (click)="previousStep(currTestStep)"
+            >PREVIOUS</span
+          ></a
+        >
+        <span>-</span>
+        <a><span (click)="nextStep(currTestStep)">PROCEED</span></a>
+      </div>
+    </footer>
+  </div>
+</ng-container>

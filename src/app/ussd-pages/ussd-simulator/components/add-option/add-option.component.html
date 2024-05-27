@@ -1,0 +1,272 @@
+<h2>{{ title }}</h2>
+
+<mat-vertical-stepper orientation="vertical" [linear]="isLinear" #stepper>
+  <mat-step [stepControl]="optionTypeForm">
+    <ng-template matStepLabel
+      >Choose what your option will point to ...</ng-template
+    >
+    <br />
+    <mat-radio-group class="example-radio-group" [(ngModel)]="optionType">
+      <mat-radio-button value="page"> Page </mat-radio-button>
+      <mat-radio-button value="prompt"> Prompt </mat-radio-button>
+    </mat-radio-group>
+    <div>
+      <button mat-raised-button matStepperNext>Next</button>
+    </div>
+  </mat-step>
+
+  <mat-step [stepControl]="optionStateForm">
+    <ng-template matStepLabel
+      >Create new {{ optionType }} OR pick an existing one...</ng-template
+    >
+    <br />
+    <mat-radio-group class="example-radio-group" [(ngModel)]="optionState">
+      <mat-radio-button value="new">
+        Create a New {{ optionType }}</mat-radio-button
+      >
+      <mat-radio-button value="existing"> Pick Existing </mat-radio-button>
+    </mat-radio-group>
+    <div>
+      <button mat-raised-button matStepperPrevious>Back</button>
+      <button mat-raised-button matStepperNext>Next</button>
+    </div>
+  </mat-step>
+
+  <mat-step
+    [stepControl]="optionExistingForm"
+    *ngIf="optionState === 'existing' && existingOptions$ | async as options"
+  >
+    <ng-template matStepLabel>Select an exisiting {{ optionType }}</ng-template>
+    <mat-form-field appearance="fill">
+      <mat-label>Choose a {{ optionType }}</mat-label>
+      <br />
+      <mat-select [(ngModel)]="selectedValue" name="option">
+        <mat-option *ngFor="let option of options" [value]="option">
+          {{ option }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <div>
+      <button mat-raised-button matStepperPrevious>Back</button>
+      <button mat-raised-button matStepperNext (click)="setExistingToOption()">
+        Next
+      </button>
+    </div>
+  </mat-step>
+
+  <ng-container *ngIf="optionState === 'new' && existingOptions$ | async">
+    <mat-step
+      [stepControl]="optionForm || optionFormPrompt"
+      *ngIf="optionType === 'page'"
+    >
+      <form [formGroup]="optionForm">
+        <ng-template matStepLabel>Setup your new {{ optionType }}</ng-template>
+        <mat-form-field appearance="fill">
+          <mat-label>Name of the {{ optionType }}</mat-label>
+          <input
+            matInput
+            formControlName="name"
+            placeholder="client/home/login"
+            required
+            type="text"
+          />
+          <small
+            *ngIf="
+              optionForm.controls['name'].invalid &&
+              (optionForm.controls['name'].dirty ||
+                optionForm.controls['name'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="optionForm.controls['name'].errors.required">
+              Page Name is required.
+            </small>
+            <small *ngIf="optionForm.controls['name'].errors.pattern">
+              <span
+                >No special-characters / numbers / white-spaces are
+                allowed.</span
+              >
+              <br />
+              <span>Minimum is 3 characters. Maximum is 12 characters.</span>
+            </small>
+          </small>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Display Title of the {{ optionType }}</mat-label>
+          <!-- <input
+            matInput
+           
+            placeholder="Welcome to the USSD Service"
+            required
+            type="text"
+          /> -->
+          <textarea matInput  formControlName="title" placeholder="Welcome to the USSD Service"
+          required>Welcome to the USSD Service</textarea>
+
+          <small
+            *ngIf="
+              optionForm.controls['title'].invalid &&
+              (optionForm.controls['title'].dirty ||
+                optionForm.controls['title'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="optionForm.controls['title'].errors.required">
+              Title is required
+            </small>
+          </small>
+        </mat-form-field>
+
+        <br />
+
+        <mat-form-field appearance="fill">
+          <mat-label>Label Name</mat-label>
+          <input matInput formControlName="label" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Label Text</mat-label>
+          <!-- <input matInput  type="text" /> -->
+          <textarea matInput formControlName="labelMsg">1600 Amphitheatre Pkwy</textarea>
+
+          <small
+            *ngIf="
+              optionForm.controls['labelMsg'].invalid &&
+              (optionForm.controls['labelMsg'].dirty ||
+                optionForm.controls['labelMsg'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="optionForm.controls['labelMsg'].errors.required">
+              Label Text is required
+            </small>
+          </small>
+        </mat-form-field>
+
+        <br />
+
+        <mat-form-field appearance="fill">
+          <mat-label>Error Label</mat-label>
+          <input matInput formControlName="errorLabel" type="text" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Error Message</mat-label>
+          <!-- <input matInput  type="text" /> -->
+          <textarea matInput formControlName="errorMsg">1600 Amphitheatre Pkwy</textarea>
+
+          <small
+            *ngIf="
+              optionForm.controls['errorMsg'].invalid &&
+              (optionForm.controls['errorMsg'].dirty ||
+                optionForm.controls['errorMsg'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="optionForm.controls['errorMsg'].errors.required">
+              Error Message is required
+            </small>
+          </small>
+        </mat-form-field>
+      </form>
+      <br />
+      <div>
+        <button mat-raised-button matStepperPrevious>Back</button>
+        <button mat-raised-button matStepperNext (click)="validateOption()">
+          Next
+        </button>
+      </div>
+    </mat-step>
+
+    <mat-step [stepControl]="optionFormPrompt" *ngIf="optionType === 'prompt'">
+      <form [formGroup]="optionFormPrompt">
+        <ng-template matStepLabel>Setup your new {{ optionType }}</ng-template>
+        <mat-form-field appearance="fill">
+          <mat-label>Name of the {{ optionType }}</mat-label>
+          <input
+            matInput
+            formControlName="name"
+            placeholder="client/home/login"
+            required
+            type="text"
+          />
+          <small
+            *ngIf="
+              optionFormPrompt.controls['name'].invalid &&
+              (optionFormPrompt.controls['name'].dirty ||
+                optionFormPrompt.controls['name'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="optionFormPrompt.controls['name'].errors.required">
+              Prompt Name is required.
+            </small>
+            <small *ngIf="optionFormPrompt.controls['name'].errors.pattern">
+              <span
+                >No special-characters / numbers / white-spaces are
+                allowed.</span
+              >
+              <br />
+              <span>Minimum is 3 characters. Maximum is 12 characters.</span>
+            </small>
+          </small>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Label Text</mat-label>
+          <input matInput formControlName="labelMsg" required type="text" />
+          <small
+            *ngIf="
+              optionFormPrompt.controls['labelMsg'].invalid &&
+              (optionFormPrompt.controls['labelMsg'].dirty ||
+                optionFormPrompt.controls['labelMsg'].touched)
+            "
+            class="formErrors"
+          >
+            <small
+              *ngIf="optionFormPrompt.controls['labelMsg'].errors.required"
+            >
+              Label Text is required
+            </small>
+          </small>
+        </mat-form-field>
+      </form>
+      <br />
+      <div>
+        <button mat-raised-button matStepperPrevious>Back</button>
+        <button mat-raised-button matStepperNext (click)="validateOption()">
+          Next
+        </button>
+      </div>
+    </mat-step>
+
+    <br />
+
+    <div>
+      <button mat-raised-button matStepperPrevious>Back</button>
+      <button mat-raised-button matStepperNext (click)="validateOption()">
+        Next
+      </button>
+    </div>
+  </ng-container>
+
+  <mat-step *ngIf="isValid">
+    <ng-template matStepLabel>Done</ng-template>
+    <p>
+      You are now done. Click the button below to create your {{ optionType }}
+    </p>
+    <button
+      class="submitBtn"
+      mat-raised-button
+      color="primary"
+      (click)="submit()"
+    >
+      Submit
+    </button>
+
+    <div>
+      <button mat-raised-button matStepperPrevious>Back</button>
+    </div>
+  </mat-step>
+</mat-vertical-stepper>

@@ -1,0 +1,186 @@
+<ng-container *ngIf="existingData$ | async">
+  <!-- Display for pages -->
+  <ng-container *ngIf="isPrompt === false">
+    <ng-container *ngIf="response$ | async as response">
+      <div class="text-overlay" *ngIf="selectedProject && selectedLanguage">
+        <div class="header">
+          <div class="addButton d-flex justify-content-between">
+            <a class="d-flex"
+              ><i
+                (click)="addOption()"
+                nz-icon
+                nz-tooltip
+                nzTooltipPlacement="rightTop"
+                nzType="plus-circle"
+                nzTooltipTitle="Add New Option"
+                nzTheme="outline"
+              ></i
+            ></a>
+          </div>
+
+          <div class="title">
+            <small>{{ response["name"].toUpperCase() }}</small>
+            <div>
+              <strong>
+                <p>{{ response["title"] }}</p>
+              </strong>
+              <a
+                ><i
+                  (click)="editPage(response)"
+                  nzTooltipTitle="Edit page"
+                  nzTooltipPlacement="rightTop"
+                  nz-tooltip
+                  style="font-size: 16px; padding-left: 10px"
+                  nz-icon
+                  nzType="edit"
+                  nzTheme="outline"
+                ></i
+              ></a>
+            </div>
+          </div>
+        </div>
+
+        <div
+          cdkDropList
+          class="example-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <div
+            class="example-box"
+            *ngFor="let ussd of response['options']; let i = index"
+            [ngStyle]="{
+              'border-left': ussd.enabled
+                ? '4px solid #00B722'
+                : '4px solid #c97c57'
+            }"
+            cdkDrag
+            (click)="onSend(i)"
+          >
+            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+            <span (click)="onSend(i)"> {{ i + 1 }} : {{ ussd["title"] }}</span>
+            <i
+              *ngIf="ussd.authenticate"
+              nz-icon
+              nzType="lock"
+              nzTheme="outline"
+            ></i>
+            <i
+              class="option-dropdown"
+              nz-icon
+              nz-dropdown
+              [nzDropdownMenu]="actionsMenu"
+              nzType="menu"
+              nzTheme="outline"
+            ></i>
+
+            <nz-dropdown-menu #actionsMenu="nzDropdownMenu">
+              <ul nz-menu>
+                <li (click)="editOption(ussd)" nz-menu-item>
+                  <i nz-icon nzType="edit" nzTheme="outline"></i
+                  ><span>edit</span>
+                </li>
+                <li
+                  (click)="deleteOption(ussd.name, response['name'])"
+                  nz-menu-item
+                >
+                  <i
+                    nz-icon
+                    style="color: rgb(214, 0, 0)"
+                    nzType="delete"
+                    nzTheme="outline"
+                  ></i
+                  ><span>delete</span>
+                </li>
+              </ul>
+            </nz-dropdown-menu>
+          </div>
+        </div>
+
+        <footer class="action-footer">
+          <div class="back-btn">
+            <i
+              nzTooltipTitle="Go Back"
+              nzTooltipPlacement="rightTop"
+              nz-tooltip
+              nz-icon
+              nzType="step-backward"
+              nzTheme="outline"
+              (click)="goBack()"
+            ></i>
+          </div>
+        </footer>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- Display for prompts -->
+  <ng-container *ngIf="isPrompt === true">
+    <div class="text-overlay" *ngIf="responsePrompt$ | async as response">
+      <div class="header">
+        <div class="example-box-prompt">
+          <a class="d-flex"
+            ><i
+              nzTooltipTitle="Add New Step"
+              nzTooltipPlacement="rightTop"
+              nz-tooltip
+              nz-icon
+              nzType="plus-circle"
+              nzTheme="outline"
+              (click)="addNewPromptStep()"
+            ></i
+          ></a>
+        </div>
+
+        <div class="title">
+          <small>{{ currentPrompt }}</small>
+          <strong>
+            <p>{{ currentPromptTitle }}</p>
+          </strong>
+        </div>
+      </div>
+
+      <div class="example-list" id="promptList">
+        <div
+          class="example-box-prompt"
+          *ngFor="let prompt of response; let i = index"
+          [ngStyle]="
+            i === currentPromptIndex
+              ? { border: '2px solid #00B722', fontSize: 'small' }
+              : { border: '2px solid #c97c57', fontSize: 'smaller' }
+          "
+          (click)="changePromptTitle(prompt, i)"
+          id="step_{{ i }}"
+        >
+          <span (click)="editPrompt(prompt)"
+            >{{ i + 1 }}: {{ prompt["title"] }}</span
+          >
+        </div>
+      </div>
+
+      <footer class="action-footer">
+        <div class="back-btn">
+          <i
+            nzTooltipTitle="Go Back"
+            nzTooltipPlacement="rightTop"
+            nz-tooltip
+            nz-icon
+            nzType="step-backward"
+            nzTheme="outline"
+            (click)="goBack()"
+          ></i>
+
+          <i
+            *ngIf="currentPrompt == 'login'"
+            nzTooltipTitle="Simulate Successful Login"
+            nzTooltipPlacement="rightTop"
+            nz-tooltip
+            nz-icon
+            nzType="step-forward"
+            nzTheme="outline"
+            (click)="simulateSuccLogin()"
+          ></i>
+        </div>
+      </footer>
+    </div>
+  </ng-container>
+</ng-container>

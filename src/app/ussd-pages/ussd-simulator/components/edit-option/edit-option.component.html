@@ -1,0 +1,64 @@
+<div class="flex-container">
+  <h2>
+    {{ title }}
+  </h2>
+  <button mat-button class="close-icon" [mat-dialog-close]="true">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<mat-vertical-stepper orientation="vertical" [linear]="isLinear" #stepper>
+  <mat-step [stepControl]="optionForm" *ngIf="existingData$ | async">
+    <form [formGroup]="optionForm">
+      <ng-template matStepLabel>Edit your existing option</ng-template>
+      <mat-form-field appearance="fill">
+        <mat-label>Name of the selected option</mat-label>
+        <input
+          matInput
+          type="text"
+          formControlName="name"
+          placeholder="client/home/login"
+          required
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Label Text</mat-label>
+        <input matInput type="text" formControlName="labelMsg" required />
+      </mat-form-field>
+      <br />
+
+      <mat-checkbox formControlName="authenticate">Authenticate</mat-checkbox>
+
+      <mat-checkbox formControlName="enabled">Enabled</mat-checkbox>
+
+      <div>
+        <button
+          mat-raised-button
+          matStepperNext
+          (click)="setExistingToOption()"
+        >
+          Next
+        </button>
+      </div>
+    </form>
+  </mat-step>
+
+  <mat-step *ngIf="isValid">
+    <ng-template matStepLabel>Done</ng-template>
+    <p>
+      You are now done. Click the button below to make changes to your option
+    </p>
+    <button
+      class="submitBtn"
+      mat-raised-button
+      color="primary"
+      (click)="submit()"
+    >
+      Submit
+    </button>
+
+    <div>
+      <button mat-raised-button matStepperPrevious>Back</button>
+    </div>
+  </mat-step>
+</mat-vertical-stepper>

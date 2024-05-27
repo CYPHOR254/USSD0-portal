@@ -1,0 +1,19 @@
+.mat-checkbox,
+mat-checkbox {
+  margin: 3rem;
+}
+
+.submitBtn {
+  margin-bottom: 1rem;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+
+  button{
+    &:focus {
+      outline: none !important;
+    }
+  }
+}

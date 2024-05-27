@@ -1,0 +1,120 @@
+<div *ngIf="allData$ | async">
+  <section>
+    <h4>Edit your API Endpoints</h4>
+    <button mat-raised-button color="primary" (click)="addNewEndpoint()">
+      Add New Endpoint
+    </button>
+  </section>
+  <hr />
+  <div class="endpointsTable">
+    <mat-form-field appearance="standard">
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="..." #input />
+    </mat-form-field>
+
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element["name"] }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="request">
+        <th mat-header-cell *matHeaderCellDef>Request</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element["request"] | json }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="request-group">
+        <th mat-header-cell *matHeaderCellDef>Request Group</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element["request-group"] | json }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="success">
+        <th mat-header-cell *matHeaderCellDef>Success Field</th>
+        <td mat-cell *matCellDef="let element">
+          {{
+            element["response"] !== undefined &&
+            element["response"]["status"] !== undefined
+              ? element["response"]["status"]["field"]
+              : ""
+          }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="sValue">
+        <th mat-header-cell *matHeaderCellDef>Success Value</th>
+        <td mat-cell *matCellDef="let element">
+          {{
+            element["response"] !== undefined &&
+            element["response"]["status"] !== undefined
+              ? element["response"]["status"]["matches"][0]["code"]
+              : ""
+          }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="error">
+        <th mat-header-cell *matHeaderCellDef>Error Field</th>
+        <td mat-cell *matCellDef="let element">
+          {{
+            element["response"] !== undefined &&
+            element["response"]["status"] !== undefined &&
+            element["response"]["status"]["error"] !== undefined
+              ? element["response"]["status"]["error"]["message"]
+              : ""
+          }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="path">
+        <th mat-header-cell *matHeaderCellDef>Path Suffix</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element["path-suffix"] }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td
+          class="actionRow"
+          mat-cell
+          *matCellDef="let element"
+          class="action-link"
+        >
+          <button
+            mat-icon-button
+            matTooltip="Edit"
+            (click)="editEndpoint(element['name'])"
+          >
+            <mat-icon class="edit">edit</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            matTooltip="Delete"
+            (click)="deleteEndpoint(element['name'])"
+          >
+            <mat-icon class="delete">delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 20]"
+      showFirstLastButtons
+      aria-label="Select page of periodic elements"
+    >
+    </mat-paginator>
+  </div>
+
+  <hr />
+</div>

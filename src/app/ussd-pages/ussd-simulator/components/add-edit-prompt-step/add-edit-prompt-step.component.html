@@ -1,0 +1,1304 @@
+<ng-container *ngIf="existingData$ | async">
+  <div class="flex-container">
+    <h2>
+      <span>{{ title }}</span>
+    </h2>
+    <button mat-button class="close-icon" [mat-dialog-close]="true">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <section class="checkbox-section" [formGroup]="navigateForm">
+    <p>
+      <mat-checkbox formControlName="hasApi">Has API Call</mat-checkbox>
+    </p>
+    <ng-container *ngIf="userSelectedType == 'input'">
+      <p>
+        <mat-checkbox
+          formControlName="validation"
+          (change)="toggleValidation($event)"
+          >Has Validation</mat-checkbox
+        >
+      </p>
+      <p>
+        <mat-checkbox
+          [checked]="basicForm.controls['errorMsg'].disabled"
+          (change)="toggleMultiErrors($event)"
+          >Multiple Errors</mat-checkbox
+        >
+      </p>
+    </ng-container>
+  </section>
+
+  <mat-tab-group dynamicHeight>
+    <mat-tab label="Basic Configurations">
+      <form [formGroup]="basicForm" class="customForm">
+        <mat-form-field appearance="fill" class="smallField">
+          <mat-label>Type</mat-label>
+          <mat-select
+            formControlName="type"
+            name="type"
+            (selectionChange)="checkStepType($event)"
+          >
+            <mat-option
+              *ngFor="let type of ['select', 'skip', 'input']"
+              [value]="type"
+            >
+              {{ type }}
+            </mat-option>
+          </mat-select>
+          <small
+            *ngIf="
+              basicForm.controls['type'].invalid &&
+              (basicForm.controls['type'].dirty ||
+                basicForm.controls['type'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="basicForm.controls['type'].errors.required">
+              Step Type is required
+            </small>
+          </small>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Step Name</mat-label>
+          <input
+            matInput
+            formControlName="name"
+            placeholder="buy-meter-start"
+          />
+          <small
+            *ngIf="
+              basicForm.controls['name'].invalid &&
+              (basicForm.controls['name'].dirty ||
+                basicForm.controls['name'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="basicForm.controls['name'].errors.required">
+              Name is required
+            </small>
+            <small *ngIf="basicForm.controls['name'].errors.pattern">
+              Name is invalid. No special characters OR numbers.
+            </small>
+          </small>
+        </mat-form-field>
+        <mat-form-field appearance="fill" id="title">
+          <mat-label>Step Title</mat-label>
+          <input
+            matInput
+            formControlName="title"
+            placeholder="Please enter xyz"
+          />
+          <small
+            *ngIf="
+              basicForm.controls['title'].invalid &&
+              (basicForm.controls['title'].dirty ||
+                basicForm.controls['title'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="basicForm.controls['title'].errors.required">
+              Step Title is required. This is what is displayed to the user.
+            </small>
+          </small>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Step Error</mat-label>
+          <input
+            matInput
+            formControlName="errorMsg"
+            placeholder="Invalid ..."
+          />
+          <small
+            *ngIf="
+              basicForm.controls['errorMsg'].invalid &&
+              (basicForm.controls['errorMsg'].dirty ||
+                basicForm.controls['errorMsg'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="basicForm.controls['errorMsg'].errors.required">
+              Step Error is required.
+            </small>
+          </small>
+        </mat-form-field>
+
+        <ng-container *ngIf="basicForm.controls['errorMsg'].disabled">
+          <br />
+          <mat-form-field appearance="fill">
+            <mat-label>Step Error Name</mat-label>
+            <input
+              matInput
+              formControlName="errorName"
+              placeholder="Invalid ..."
+            />
+            <small
+              *ngIf="
+                basicForm.controls['errorName'].invalid &&
+                (basicForm.controls['errorName'].dirty ||
+                  basicForm.controls['errorName'].touched)
+              "
+              class="formErrors"
+            >
+              <small *ngIf="basicForm.controls['errorName'].errors.required">
+                Step Error Name is required.
+              </small>
+            </small>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Step Error Value</mat-label>
+            <input
+              matInput
+              formControlName="errorValue"
+              placeholder="Invalid ..."
+            />
+            <small
+              *ngIf="
+                basicForm.controls['errorValue'].invalid &&
+                (basicForm.controls['errorValue'].dirty ||
+                  basicForm.controls['errorValue'].touched)
+              "
+              class="formErrors"
+            >
+              <small *ngIf="basicForm.controls['errorValue'].errors.required">
+                Step Error Value is required.
+              </small>
+            </small>
+          </mat-form-field>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="addMultiErrors(basicForm.value)"
+            class="addCustomOptionBtn"
+          >
+            Add Errors
+          </button>
+
+          <div class="table">
+            <table
+              mat-table
+              [dataSource]="multErrorsDataSource"
+              class="mat-elevation-z8"
+            >
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Error Name</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.name }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef>Error Value</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.value }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="errorFor">
+                <th mat-header-cell *matHeaderCellDef>Error For</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.errorFor }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td
+                  class="actionRow"
+                  mat-cell
+                  *matCellDef="let element"
+                  class="action-link"
+                >
+                  <button
+                    mat-icon-button
+                    matTooltip="Edit"
+                    class="edit"
+                    (click)="editRecord(element, 'errors')"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    matTooltip="Delete"
+                    class="delete"
+                    (click)="removeFromArray(element, 'errors')"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="multErrorsDisplayedColumns; sticky: true"
+              ></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: multErrorsDisplayedColumns"
+              ></tr>
+            </table>
+          </div>
+        </ng-container>
+      </form>
+
+      <form
+        [formGroup]="optionsForm"
+        *ngIf="userSelectedType == 'select'"
+        class="customForm"
+      >
+        <mat-form-field appearance="fill">
+          <mat-label>Option Type</mat-label>
+          <mat-select
+            formControlName="optionType"
+            (selectionChange)="setOptionType($event)"
+          >
+            <mat-option
+              *ngFor="let option of ['manual', 'existing', 'from_api']"
+              [value]="option"
+            >
+              {{ option }}
+            </mat-option>
+          </mat-select>
+          <small
+            *ngIf="
+              optionsForm.controls['optionType'].invalid &&
+              (optionsForm.controls['optionType'].dirty ||
+                optionsForm.controls['optionType'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="optionsForm.controls['optionType'].errors.required">
+              Option Type is required.
+            </small>
+          </small>
+        </mat-form-field>
+
+        <ng-container appearance="fill" *ngIf="selectedOptionType == 'manual'">
+          <mat-form-field appearance="fill">
+            <mat-label>Option Label</mat-label>
+            <input
+              matInput
+              formControlName="optionLabel"
+              placeholder="Confirm"
+            />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Option Value</mat-label>
+            <input
+              matInput
+              formControlName="optionValue"
+              placeholder="1/ Yes/ True/ Confirmed"
+            />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Option Jump To(optional)</mat-label>
+            <input
+              matInput
+              formControlName="optionJump"
+              placeholder="buy-meter-confirm"
+            />
+          </mat-form-field>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="addOptionToArray(optionsForm.value)"
+            class="addCustomOptionBtn"
+          >
+            Add Option
+          </button>
+          <div class="table">
+            <table
+              mat-table
+              [dataSource]="customOptionsDataSource"
+              class="mat-elevation-z8"
+            >
+              <ng-container matColumnDef="label">
+                <th mat-header-cell *matHeaderCellDef>Label</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.label }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef>Value</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.value }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="jump-to">
+                <th mat-header-cell *matHeaderCellDef>Jump To</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element["jump-to"] || "NULL" }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td
+                  class="actionRow"
+                  mat-cell
+                  *matCellDef="let element"
+                  class="action-link"
+                >
+                  <button
+                    mat-icon-button
+                    matTooltip="Edit"
+                    (click)="editRecord(element, 'options')"
+                  >
+                    <mat-icon class="edit">edit</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    matTooltip="Delete"
+                    (click)="removeFromArray(element, 'options')"
+                  >
+                    <mat-icon class="delete">delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="customOptionsColumns; sticky: true"
+              ></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: customOptionsColumns"
+              ></tr>
+            </table>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="!isLoading && selectedOptionType !== 'manual'">
+          <mat-form-field
+            appearance="fill"
+            *ngIf="selectedOptionType == 'existing'"
+          >
+            <mat-label>Choose an existing option</mat-label>
+            <mat-select
+              formControlName="existingOption"
+              name="existingOption"
+              (selectionChange)="setExistingOption($event)"
+            >
+              <mat-option
+                *ngFor="let option of allExistingOptionsInConfig"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-select>
+            <small
+              *ngIf="
+                optionsForm.controls['optionType'].invalid &&
+                (optionsForm.controls['optionType'].dirty ||
+                  optionsForm.controls['optionType'].touched)
+              "
+              class="formErrors"
+            >
+              <small *ngIf="optionsForm.controls['optionType'].errors.required">
+                Option Type is required.
+              </small>
+            </small>
+          </mat-form-field>
+
+          <ng-container *ngIf="selectedOptionType == 'from_api'">
+            <mat-form-field appearance="fill">
+              <mat-label>Enter option name</mat-label>
+              <input
+                matInput
+                formControlName="apiOption"
+                placeholder="meters/accounts"
+              />
+              <small
+                *ngIf="
+                  optionsForm.controls['apiOption'].invalid &&
+                  (optionsForm.controls['apiOption'].dirty ||
+                    optionsForm.controls['apiOption'].touched)
+                "
+                class="formErrors"
+              >
+                <small
+                  *ngIf="optionsForm.controls['apiOption'].errors.required"
+                >
+                  Enter option name that will exist in the Global Request
+                  Details/Account Profile.
+                </small>
+              </small>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Enter your option's error.</mat-label>
+              <input
+                matInput
+                formControlName="optionError"
+                placeholder="meters"
+              />
+              <small
+                *ngIf="
+                  optionsForm.controls['optionError'].invalid &&
+                  (optionsForm.controls['optionError'].dirty ||
+                    optionsForm.controls['optionError'].touched)
+                "
+                class="formErrors"
+              >
+                <small
+                  *ngIf="optionsForm.controls['optionError'].errors.required"
+                >
+                  Enter error to be displayed when options are not found.
+                </small>
+              </small>
+            </mat-form-field>
+          </ng-container>
+        </ng-container>
+      </form>
+    </mat-tab>
+
+    <mat-tab
+      label="Navigation Configurations"
+      *ngIf="userSelectedType !== 'skip'"
+    >
+      <form [formGroup]="navigateForm" class="customForm">
+        <ng-container *ngIf="userSelectedType == 'select'">
+          <ng-container
+            *ngIf="
+              customOptionsArr.length > 0 && selectedOptionType === 'manual'
+            "
+          >
+            <mat-form-field appearance="fill">
+              <mat-label>Save As(optional)</mat-label>
+              <input matInput formControlName="save-as" />
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Previous</mat-label>
+              <input
+                type="text"
+                placeholder="Pick one"
+                aria-label="Previous"
+                matInput
+                formControlName="previous"
+                [matAutocomplete]="auto"
+                (keydown)="setAutoComplete('previous')"
+              />
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="fill"
+              *ngIf="navigateForm.value.hasApi !== true"
+            >
+              <mat-label>Next</mat-label>
+              <input
+                type="text"
+                placeholder="Pick one"
+                aria-label="Next"
+                matInput
+                formControlName="next"
+                [matAutocomplete]="auto"
+                (keydown)="setAutoComplete('next')"
+              />
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              *ngIf="navigateForm.value.hasApi !== true"
+              (click)="submitNewStep()"
+            >
+              Submit Form
+            </button>
+          </ng-container>
+
+          <!-- <ng-container
+            *ngIf="
+              selectedOptionType === 'existing' &&
+              selectedExistingOptions == 'confirm-options'
+            "
+          >
+            <mat-form-field appearance="fill">
+              <mat-label>Previous</mat-label>
+              <input
+                type="text"
+                placeholder="Pick one"
+                aria-label="Previous"
+                matInput
+                formControlName="previous"
+                [matAutocomplete]="auto"
+                (keydown)="setAutoComplete('previous')"
+              />
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Action</mat-label>
+              <mat-select formControlName="action" name="action">
+                <mat-option
+                  *ngFor="let item of ['transact', 'update-parameters']"
+                  [value]="item"
+                >
+                  {{ item }}
+                </mat-option>
+              </mat-select>
+              <small
+                *ngIf="
+                  navigateForm.controls['action'].invalid &&
+                  (navigateForm.controls['action'].dirty ||
+                    navigateForm.controls['action'].touched)
+                "
+                class="formErrors"
+              >
+                <small *ngIf="navigateForm.controls['action'].errors.required">
+                  Action is required.
+                </small>
+              </small>
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              *ngIf="navigateForm.value.hasApi !== true"
+              [disabled]="!navigateForm.valid"
+              (click)="submitNewStep()"
+            >
+              Submit Form
+            </button>
+          </ng-container>
+
+          <ng-container
+            *ngIf="
+              selectedOptionType === 'existing' &&
+              selectedExistingOptions == 'yes-no-options'
+            "
+          >
+            <mat-form-field appearance="fill">
+              <mat-label>Previous</mat-label>
+              <input
+                type="text"
+                placeholder="Pick one"
+                aria-label="Previous"
+                matInput
+                formControlName="previous"
+                [matAutocomplete]="auto"
+                (keydown)="setAutoComplete('previous')"
+              />
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Action</mat-label>
+              <mat-select formControlName="action" name="action">
+                <mat-option
+                  *ngFor="let item of ['navigate', 'transact']"
+                  [value]="item"
+                >
+                  {{ item }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              *ngIf="navigateForm.value.hasApi != true"
+              [disabled]="!navigateForm.valid"
+              (click)="submitNewStep()"
+            >
+              Submit Form
+            </button>
+          </ng-container> -->
+
+          <ng-container *ngIf="selectedOptionType === 'existing'">
+            <mat-form-field
+              appearance="fill"
+              *ngIf="navigateForm.value.hasApi !== true"
+            >
+              <mat-label>On Accept</mat-label>
+              <input
+                type="text"
+                placeholder="Pick one"
+                aria-label="On Accept"
+                matInput
+                formControlName="accept"
+                [matAutocomplete]="auto"
+                (keydown)="setAutoComplete('accept')"
+              />
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>On Cancel</mat-label>
+              <input
+                type="text"
+                placeholder="Pick one"
+                aria-label="On Cancel"
+                matInput
+                formControlName="cancel"
+                [matAutocomplete]="auto"
+                (keydown)="setAutoComplete('cancel')"
+              />
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Previous</mat-label>
+              <input
+                type="text"
+                placeholder="Pick one"
+                aria-label="Previous"
+                matInput
+                formControlName="previous"
+                [matAutocomplete]="auto"
+                (keydown)="setAutoComplete('previous')"
+              />
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option
+                  *ngFor="let option of filteredOptions | async"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Action</mat-label>
+              <mat-select formControlName="action" name="action">
+                <mat-option
+                  *ngFor="
+                    let item of ['navigate', 'transact', 'update-parameters']
+                  "
+                  [value]="item"
+                >
+                  {{ item }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              *ngIf="navigateForm.value.hasApi !== true"
+              [disabled]="!navigateForm.valid"
+              (click)="submitNewStep()"
+            >
+              Submit Form
+            </button>
+          </ng-container>
+        </ng-container>
+
+        <ng-container
+          *ngIf="
+            userSelectedType === 'input' || selectedOptionType === 'from_api'
+          "
+        >
+          <mat-form-field appearance="fill">
+            <mat-label>Save As(optional)</mat-label>
+            <input matInput formControlName="save-as" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Previous</mat-label>
+            <input
+              type="text"
+              placeholder="Pick one"
+              aria-label="Previous"
+              matInput
+              formControlName="previous"
+              [matAutocomplete]="auto"
+              (keydown)="setAutoComplete('previous')"
+            />
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+              <mat-option
+                *ngFor="let option of filteredOptions | async"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Next</mat-label>
+            <input
+              type="text"
+              placeholder="Pick one"
+              aria-label="Next"
+              matInput
+              formControlName="next"
+              [matAutocomplete]="auto"
+              (keydown)="setAutoComplete('next')"
+            />
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+              <mat-option
+                *ngFor="let option of filteredOptions | async"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="
+              validationStatus === false && navigateForm.value.hasApi !== true
+            "
+            (click)="submitNewStep()"
+          >
+            Submit Changes
+          </button>
+        </ng-container>
+      </form>
+
+      <form
+        [formGroup]="validationForm"
+        *ngIf="validationStatus === true"
+        class="customFormB"
+      >
+        <mat-form-field appearance="fill">
+          <mat-label>Validation Name</mat-label>
+          <input
+            type="text"
+            placeholder="Pick one"
+            aria-label="Validation"
+            matInput
+            formControlName="validationName"
+            [matAutocomplete]="auto"
+            (keydown)="setAutoComplete('validationName')"
+          />
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+            <mat-option
+              *ngFor="let option of filteredOptions | async"
+              [value]="option"
+            >
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+          <small
+            *ngIf="
+              validationForm.controls['validationName'].invalid &&
+              (validationForm.controls['validationName'].dirty ||
+                validationForm.controls['validationName'].touched)
+            "
+            class="formErrors"
+          >
+            <small
+              *ngIf="validationForm.controls['validationName'].errors.required"
+            >
+              Validation Function is required.
+            </small>
+          </small>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Validation Type</mat-label>
+          <mat-select formControlName="validationType">
+            <mat-option *ngFor="let type of ['joi', 'custom']" [value]="type">
+              {{ type }}
+            </mat-option>
+          </mat-select>
+          <small
+            *ngIf="
+              validationForm.controls['validationType'].invalid &&
+              (validationForm.controls['validationType'].dirty ||
+                validationForm.controls['validationType'].touched)
+            "
+            class="formErrors"
+          >
+            <small
+              *ngIf="validationForm.controls['validationType'].errors.required"
+            >
+              Validation Type is required.
+            </small>
+          </small>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Validation Arguments</mat-label>
+          <input matInput type="text" formControlName="validationArguments" />
+          <small
+            *ngIf="
+              validationForm.controls['validationArguments'].invalid &&
+              (validationForm.controls['validationArguments'].dirty ||
+                validationForm.controls['validationArguments'].touched)
+            "
+            class="formErrors"
+          >
+            <small
+              *ngIf="
+                validationForm.controls['validationArguments'].errors.required
+              "
+            >
+              Validation Type is required.
+            </small>
+          </small>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="addValidators(validationForm.value)"
+          class="addCustomOptionBtn"
+        >
+          Add validator
+        </button>
+
+        <div class="table">
+          <table
+            mat-table
+            [dataSource]="validatorsDataSource"
+            class="mat-elevation-z8"
+          >
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.name }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.type }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="arguments">
+              <th mat-header-cell *matHeaderCellDef>Arguments</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.arguments || "NULL" }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td
+                class="actionRow"
+                mat-cell
+                *matCellDef="let element"
+                class="action-link"
+              >
+                <button
+                  mat-icon-button
+                  matTooltip="Edit"
+                  class="edit"
+                  (click)="editRecord(element, 'validators')"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  matTooltip="Delete"
+                  class="delete"
+                  (click)="removeFromArray(element, 'validators')"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="validatorsDisplayedColumns; sticky: true"
+            ></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: validatorsDisplayedColumns"
+            ></tr>
+          </table>
+        </div>
+
+        <button mat-raised-button color="primary" (click)="submitNewStep()">
+          Submit Form
+        </button>
+      </form>
+    </mat-tab>
+
+    <mat-tab
+      label="Advanced Configurations"
+      *ngIf="navigateForm.value.hasApi === true"
+      (click)="cacheRequest($event)"
+    >
+      <form [formGroup]="advancedForm" class="customForm">
+        <mat-form-field appearance="fill">
+          <mat-label>API Route</mat-label>
+          <!-- <mat-select formControlName="route">
+              <mat-option *ngFor="let route of allExistingRoutes" [value]="route">
+                {{ route }}
+              </mat-option>
+            </mat-select> -->
+          <input
+            type="text"
+            placeholder="Pick one"
+            aria-label="Route"
+            matInput
+            formControlName="route"
+            [matAutocomplete]="auto"
+            (keydown)="setAutoComplete('route')"
+          />
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+            <mat-option
+              *ngFor="let option of filteredOptions | async"
+              [value]="option"
+            >
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+          <small
+            *ngIf="
+              advancedForm.controls['route'].invalid &&
+              (advancedForm.controls['route'].dirty ||
+                advancedForm.controls['route'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="advancedForm.controls['route'].errors.required">
+              Route/Endpoint is required.
+            </small>
+          </small>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="addEndpoint()"
+            [attr.aria-label]="'Add API endpoint'"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>API Success</mat-label>
+          <!-- <mat-select formControlName="success">
+            <mat-option
+              *ngFor="let prompt of allPromptPagesStepsArray"
+              [value]="prompt"
+            >
+              {{ prompt }}
+            </mat-option>
+          </mat-select> -->
+          <input
+            type="text"
+            placeholder="Pick one"
+            aria-label="Success"
+            matInput
+            formControlName="success"
+            [matAutocomplete]="auto"
+            (keydown)="setAutoComplete('success')"
+          />
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+            <mat-option
+              *ngFor="let option of filteredOptions | async"
+              [value]="option"
+            >
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+          <small
+            *ngIf="
+              advancedForm.controls['success'].invalid &&
+              (advancedForm.controls['success'].dirty ||
+                advancedForm.controls['success'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="advancedForm.controls['success'].errors.required">
+              Success step/prompt is required.
+            </small>
+          </small>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>API Error</mat-label>
+          <!-- <mat-select formControlName="error">
+            <mat-option
+              *ngFor="let prompt of allPromptPagesStepsArray"
+              [value]="prompt"
+            >
+              {{ prompt }}
+            </mat-option>
+          </mat-select> -->
+          <input
+            type="text"
+            placeholder="Pick one"
+            aria-label="Error"
+            matInput
+            formControlName="error"
+            [matAutocomplete]="auto"
+            (keydown)="setAutoComplete('error')"
+          />
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+            <mat-option
+              *ngFor="let option of filteredOptions | async"
+              [value]="option"
+            >
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+          <small
+            *ngIf="
+              advancedForm.controls['error'].invalid &&
+              (advancedForm.controls['error'].dirty ||
+                advancedForm.controls['error'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="advancedForm.controls['error'].errors.required">
+              Error step/prompt is required.
+            </small>
+          </small>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="smallField">
+          <mat-label>Cache</mat-label>
+          <mat-select
+            formControlName="cache"
+            (selectionChange)="cacheRequest($event)"
+          >
+            <mat-option *ngFor="let status of [true, false]" [value]="status">
+              {{ status }}
+            </mat-option>
+          </mat-select>
+          <small
+            *ngIf="
+              advancedForm.controls['cache'].invalid &&
+              (advancedForm.controls['cache'].dirty ||
+                advancedForm.controls['cache'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="advancedForm.controls['cache'].errors.required">
+              Cache Status is required.
+            </small>
+          </small>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="submitNewStep()"
+          *ngIf="cacheStatus === false && advancedForm.valid"
+        >
+          Submit Form
+        </button>
+
+        <ng-container *ngIf="cacheStatus === true">
+          <mat-form-field appearance="fill">
+            <mat-label>Cache Path</mat-label>
+            <mat-select formControlName="cache-path">
+              <mat-option
+                *ngFor="
+                  let path of ['account-details', 'global-request-details']
+                "
+                [value]="path"
+              >
+                {{ path }}
+              </mat-option>
+            </mat-select>
+            <small
+              *ngIf="
+                advancedForm.controls['cache-path'].invalid &&
+                (advancedForm.controls['cache-path'].dirty ||
+                  advancedForm.controls['cache-path'].touched)
+              "
+              class="formErrors"
+            >
+              <small
+                *ngIf="advancedForm.controls['cache-path'].errors.required"
+              >
+                Cache Path is required.
+              </small>
+            </small>
+          </mat-form-field>
+          <br />
+          <mat-form-field appearance="fill">
+            <mat-label>Cache Params Path</mat-label>
+            <input matInput formControlName="path" placeholder="userObject" />
+            <small
+              *ngIf="
+                advancedForm.controls['path'].invalid &&
+                (advancedForm.controls['path'].dirty ||
+                  advancedForm.controls['path'].touched)
+              "
+              class="formErrors"
+            >
+              <small *ngIf="advancedForm.controls['path'].errors.required">
+                API Request object key is required.
+              </small>
+            </small>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Cache Params Save-As</mat-label>
+            <input
+              matInput
+              formControlName="save-as"
+              placeholder="userDetails"
+            />
+            <small
+              *ngIf="
+                advancedForm.controls['save-as'].invalid &&
+                (advancedForm.controls['save-as'].dirty ||
+                  advancedForm.controls['save-as'].touched)
+              "
+              class="formErrors"
+            >
+              <small *ngIf="advancedForm.controls['save-as'].errors.required">
+                Save-As key is required.
+              </small>
+            </small>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Format-As(optional)</mat-label>
+            <input
+              matInput
+              formControlName="format-as"
+              placeholder="transform-user-data"
+            />
+            <small
+              *ngIf="
+                advancedForm.controls['format-as'].invalid &&
+                (advancedForm.controls['format-as'].dirty ||
+                  advancedForm.controls['format-as'].touched)
+              "
+              class="formErrors"
+            >
+              <small *ngIf="advancedForm.controls['format-as'].errors.required">
+                Format-As key is required.
+              </small>
+            </small>
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="addCacheParameters(advancedForm.value)"
+            class="addCustomOptionBtn"
+          >
+            Add to Table
+          </button>
+
+          <br />
+
+          <div class="table">
+            <table
+              mat-table
+              [dataSource]="cacheParamsDataSource"
+              class="mat-elevation-z8"
+            >
+              <ng-container matColumnDef="path">
+                <th mat-header-cell *matHeaderCellDef>Path</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.path }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="save-as">
+                <th mat-header-cell *matHeaderCellDef>Save As</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element["save-as"] }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="format-as">
+                <th mat-header-cell *matHeaderCellDef>Format As</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element["format-as"] || "NULL" }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td
+                  class="actionRow"
+                  mat-cell
+                  *matCellDef="let element"
+                  class="action-link"
+                >
+                  <button
+                    mat-icon-button
+                    matTooltip="Edit"
+                    class="edit"
+                    (click)="editRecord(element, 'cacheParams')"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    matTooltip="Delete"
+                    class="delete"
+                    (click)="removeFromArray(element, 'cacheParams')"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="cacheParamsDisplayedColumns; sticky: true"
+              ></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: cacheParamsDisplayedColumns"
+              ></tr>
+            </table>
+          </div>
+        </ng-container>
+
+        <button
+          mat-raised-button
+          color="primary"
+          *ngIf="cacheStatus"
+          [disabled]="!advancedForm.valid"
+          (click)="submitNewStep()"
+        >
+          Submit Form
+        </button>
+      </form>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>

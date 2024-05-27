@@ -1,0 +1,78 @@
+<ng-container *ngIf="existingData$ | async">
+  <h2>Edit {{ title }}</h2>
+  <form [formGroup]="form">
+    <mat-form-field appearance="fill">
+      <mat-label>Page Name</mat-label>
+      <input
+        matInput
+        placeholder="home-page"
+        formControlName="pageName"
+        required
+      />
+      <small
+        *ngIf="
+          form.controls['pageName'].invalid &&
+          (form.controls['pageName'].dirty || form.controls['pageName'].touched)
+        "
+        class="formErrors"
+      >
+        <small *ngIf="form.controls['pageName'].errors.required">
+          Page Name is required
+        </small>
+      </small>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Page Title</mat-label>
+      <input
+        matInput
+        placeholder="Welcome to the USSD Service"
+        formControlName="pageTitle"
+        required
+      />
+      <small
+        *ngIf="
+          form.controls['pageTitle'].invalid &&
+          (form.controls['pageTitle'].dirty ||
+            form.controls['pageTitle'].touched)
+        "
+        class="formErrors"
+      >
+        <small *ngIf="form.controls['pageTitle'].errors.required">
+          Page Title is required
+        </small>
+      </small>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Page Error</mat-label>
+      <input
+        matInput
+        placeholder="Invalid Selection"
+        formControlName="pageError"
+        required
+      />
+      <small
+        *ngIf="
+          form.controls['pageError'].invalid &&
+          (form.controls['pageError'].dirty ||
+            form.controls['pageError'].touched)
+        "
+        class="formErrors"
+      >
+        <small *ngIf="form.controls['pageError'].errors.required">
+          Page Error is required
+        </small>
+      </small>
+    </mat-form-field>
+
+    <button
+      class="submitBtn"
+      mat-raised-button
+      color="primary"
+      (click)="editPage()"
+    >
+      Edit changes to Current Page
+    </button>
+  </form>
+</ng-container>

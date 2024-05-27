@@ -1,0 +1,11 @@
+<div class="container">
+    <nz-card nzTitle="{{cardTitle | uppercase}}" nzSize="large" [nzLoading]="loading"  [nzBordered]="false">
+        <div nz-form [formGroup]="form">
+            <nz-form-item>
+                <nz-form-control nzErrorTip="Language configs are required">
+                    <textarea name="" class="jsonViewTextArea" cols="30" rows="22" [value]="languageConfigs" [(ngModel)]="languageConfigs" formControlName="languageConfigs"></textarea>
+                </nz-form-control>
+            </nz-form-item>
+        </div>
+    </nz-card>
+</div>

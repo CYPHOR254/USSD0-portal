@@ -1,0 +1,60 @@
+.text-overlay {
+  padding: 10px;
+  background-color: #1eb1ae;
+  
+
+  .header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+
+    .back-btn {
+      padding-top: 0.2em;
+
+      i:hover {
+        cursor: pointer;
+      }
+    }
+    // .tag {
+    // }
+  }
+
+  .testBodyContainer {
+    overflow-y: hidden;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    grid-area: options;
+    overflow: hidden;
+  }
+
+  .testDisplay {
+    display: flex;
+    margin: 5px;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+
+    span {
+      padding: 0 5px;
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+  }
+
+  .action-footer {
+    margin: 0 auto;
+
+    input {
+      margin-top: 10px;
+      text-align: center;
+    }
+  }
+}

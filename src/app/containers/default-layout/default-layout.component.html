@@ -1,0 +1,168 @@
+<app-header
+  [navbarBrandRouterLink]="['/overview']"
+  [fixed]="true"
+  [navbarBrandFull]="{
+    src: 'assets/img/brand/logo.png',
+    width: 100,
+    height: 50,
+    alt: 'Eclectics Logo',
+    class: 'compLogo'
+  }"
+  [sidebarToggler]="'lg'"
+  [asideMenuToggler]="false"
+  [mobileAsideMenuToggler]="false"
+  [mobileSidebarToggler]="'lg'"
+  style="min-width: 400px !important; display: flex"
+>
+  <span
+    style="
+      font-size: large;
+      font-weight: 600;
+      color: #0e2f59;
+      padding-left: 5%;
+      flex: 3;
+      text-align: center;
+    "
+  >
+    CONFIGURABLE USSD VERSION &nbsp;
+  </span>
+
+  <ul class="nav navbar-nav">
+    <li class="nav-item dropdown" dropdown placement="bottom right">
+      <a
+        class="nav-link"
+        data-toggle="dropdown"
+        href="#"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        dropdownToggle
+        (click)="(false)"
+      >
+        <img
+          src="assets/img/avatars/6.jpg"
+          class="img-avatar"
+          alt="admin@bootstrapmaster.com"
+        />
+      </a>
+      <div
+        class="dropdown-menu dropdown-menu-right"
+        *dropdownMenu
+        aria-labelledby="simple-dropdown"
+      >
+        <a class="dropdown-item" (click)="logout()"
+          ><i class="fa fa-lock"></i> Logout</a
+        >
+      </div>
+    </li>
+  </ul>
+</app-header>
+
+<div class="app-body">
+  <app-sidebar
+    #appSidebar
+    [fixed]="true"
+    [display]="'lg'"
+    [minimized]="sidebarMinimized"
+    (minimizedChange)="toggleMinimize($event)"
+  >
+    <app-sidebar-nav
+      [navItems]="navItems"
+      [perfectScrollbar]
+      [disabled]="appSidebar.minimized"
+    ></app-sidebar-nav>
+    <!-- <app-sidebar-minimizer></app-sidebar-minimizer> -->
+  </app-sidebar>
+
+  <!-- Main content -->
+  <main class="main">
+    <!-- Breadcrumb -->
+    <!-- breaking change 'cui-breadcrumb' -->
+    <cui-breadcrumb>
+      <!-- Breadcrumb Menu-->
+      <li class="breadcrumb-menu d-md-down-none">
+        <div
+          class="btn-group d-flex align-items-center"
+          role="group"
+          aria-label="Button group with nested dropdown"
+        >
+          <a class="btn">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              aria-label="Mat menu button"
+            >
+              <ng-container *ngIf="pendPubl$ | async"> </ng-container>
+              <mat-icon
+                *ngIf="isPendingPublish"
+                matBadge="!"
+                matBadgeSize="small"
+                matBadgeOverlap="false"
+                matBadgeColor="warn"
+                >settings</mat-icon
+              >
+              <mat-icon *ngIf="!isPendingPublish">settings</mat-icon>
+            </button></a
+          >
+
+          <a class="btn" (click)="goBack()"
+            ><i class="fa fa-fast-backward"></i> &nbsp;Back</a
+          >
+          <!-- <a class="btn" href="#"><i class="icon-settings"></i> &nbsp;Settings</a> -->
+        </div>
+      </li>
+    </cui-breadcrumb>
+
+    <div class="container-fluid">
+      <router-outlet></router-outlet>
+    </div>
+    <!-- /.container-fluid -->
+  </main>
+</div>
+
+<app-footer>
+  <span
+    ><a class="ec-success" href="https://eclectics.io/"
+      >Eclectics International</a
+    >
+    &copy; {{ year | date : "y" }}</span
+  >
+  <span class="ml-auto"
+    >Powered by
+    <a class="ec-success" href="https://eclectics.io/"
+      >Eclectics Research & Development</a
+    ></span
+  >
+</app-footer>
+
+<mat-menu #menu="matMenu">
+  <div>
+    <button mat-menu-item (click)="publish()" [disabled]="!isPendingPublish">
+      <mat-icon
+        *ngIf="isPendingPublish"
+        matBadge="!"
+        matBadgeSize="small"
+        matBadgeOverlap="false"
+        matBadgeColor="warn"
+        >swap_horiz</mat-icon
+      >
+      <mat-icon *ngIf="!isPendingPublish">swap_horiz</mat-icon>
+      <span>Publish</span>
+    </button>
+    <ng-container *ngIf="publishToRedis$ | async"></ng-container>
+  </div>
+  
+  <div>
+    <button mat-menu-item disabled="false">
+      <mat-icon>trending_flat</mat-icon>
+      <span routerLink="/ussd/ussd-simulator">Proceed To Simulator</span>
+    </button>
+  </div>
+
+  <div>
+    <button mat-menu-item (click)="changeUssdLanguage()">
+      <mat-icon>language</mat-icon>
+      <span>Change Language</span>
+    </button>
+  </div>
+</mat-menu>

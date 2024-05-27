@@ -1,0 +1,34 @@
+workflow:
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == 'ussd-simulator-funtionality') || ($CI_COMMIT_BRANCH == 'cicd-testing' || $CI_COMMIT_BRANCH == 'ussd-simulator-funtionality')
+      when: always
+      
+.curl_template: &trigger_test_deploy_template |
+ curl --header "X-Gitlab-Token: $AWX_WEBHOOK_KEY" -X POST $AWX_WEBHOOK_URL -H "Content-Type: application/json" -d '{"ci_commit_sha" : "'"$CI_COMMIT_SHA"'", "deploy_environment" : "testing", "tag" : "false", "deploy_branch" : "ussd-simulator-funtionality" }'
+ 
+stages:
+  - build
+  - trigger-deploy
+
+variables:
+  GIT_DEPTH: 2
+
+buildDevelopmentContainer:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR"
+      --dockerfile "Dockerfile"
+      --destination "devops-registry.ekenya.co.ke/configurable-ussd/configurable-ussd-portal:latest"
+
+deploy_test:
+  stage: trigger-deploy
+  image: docker:20.10.21
+  script:
+    - wget https://github.com/moparisthebest/static-curl/releases/download/v7.87.0/curl-amd64
+    - mv curl-amd64 /usr/local/bin/curl
+    - chmod +x /usr/local/bin/curl
+    - *trigger_test_deploy_template

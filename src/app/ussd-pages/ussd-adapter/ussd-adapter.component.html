@@ -1,0 +1,505 @@
+<ng-container *ngIf="allData$ | async">
+  <div class="d-flex justify-content-between">
+    <mat-tab-group dynamicHeight>
+      <mat-tab label="User Lookup">
+        <div class="d-flex justify-content-between align-items-center">
+          <form class="customForm" [formGroup]="ussdLookupForm">
+            <mat-form-field appearance="fill">
+              <mat-label>Lookup Endpoint</mat-label>
+              <input
+                matInput
+                placeholder="true"
+                formControlName="lookupEndpoint"
+              />
+              <!-- <small
+                    *ngIf="
+                      basicForm.controls['name'].invalid &&
+                      (basicForm.controls['name'].dirty ||
+                        basicForm.controls['name'].touched)
+                    "
+                    class="formErrors"
+                  >
+                    <small *ngIf="basicForm.controls['name'].errors.required">
+                      Name is required
+                    </small>
+                    <small *ngIf="basicForm.controls['name'].errors.pattern">
+                      Name is invalid. No special characters OR numbers.
+                    </small>
+                  </small> -->
+              <small>
+                <small>
+                  Here we pick an endpoint we will use for user lookup.
+                </small>
+              </small>
+              <button mat-icon-button matSuffix (click)="openEndpointModal()">
+                <mat-icon>{{ "visibility" }}</mat-icon>
+              </button>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>API Key to cross-check</mat-label>
+              <input
+                matInput
+                placeholder="true"
+                formControlName="apiCrossCheckField"
+              />
+              <!-- <small
+                    *ngIf="
+                      basicForm.controls['name'].invalid &&
+                      (basicForm.controls['name'].dirty ||
+                        basicForm.controls['name'].touched)
+                    "
+                    class="formErrors"
+                  >
+                    <small *ngIf="basicForm.controls['name'].errors.required">
+                      Name is required
+                    </small>
+                    <small *ngIf="basicForm.controls['name'].errors.pattern">
+                      Name is invalid. No special characters OR numbers.
+                    </small>
+                  </small> -->
+              <small>
+                <small>
+                  This is the field in our API response that we will use to
+                  navigate the user to the correct page/prompt based on their
+                  status
+                </small>
+              </small>
+            </mat-form-field>
+
+            <ng-container *ngIf="lookupStatuses">
+              <mat-form-field
+                appearance="fill"
+                *ngFor="let item of lookupStatuses['matches']"
+              >
+                <mat-label
+                  >If {{ ussdLookupForm.value["apiCrossCheckField"] }} equals
+                  {{ item["code"] }}</mat-label
+                >
+                <input
+                  matInput
+                  placeholder="true"
+                  [value]="'User is ' + item['status']"
+                />
+                <!-- <small
+                      *ngIf="
+                        basicForm.controls['name'].invalid &&
+                        (basicForm.controls['name'].dirty ||
+                          basicForm.controls['name'].touched)
+                      "
+                      class="formErrors"
+                    >
+                      <small *ngIf="basicForm.controls['name'].errors.required">
+                        Name is required
+                      </small>
+                      <small *ngIf="basicForm.controls['name'].errors.pattern">
+                        Name is invalid. No special characters OR numbers.
+                      </small>
+                    </small> -->
+                <button mat-icon-button matSuffix (click)="editStatus(item)">
+                  <mat-icon>{{ "edit" }}</mat-icon>
+                </button>
+              </mat-form-field>
+            </ng-container>
+          </form>
+
+          <form class="customForm" [formGroup]="ussdConfigDataForm">
+            <!-- <mat-form-field appearance="fill">
+              <mat-label>Registration Enabled</mat-label>
+              <input
+                matInput
+                placeholder="true"
+                formControlName="registrationEnabled"
+              />
+            </mat-form-field> -->
+            <mat-form-field appearance="fill">
+              <mat-label>Registration Check</mat-label>
+              <input
+                matInput
+                placeholder="buy-meter-start"
+                formControlName="registrationCheck"
+                disabled
+              />
+
+              <small>
+                <small>
+                  To check if the User is registered, we look at the
+                  <strong>
+                    {{
+                      ussdConfigDataForm["controls"]["registrationCheck"].value
+                    }}
+                  </strong>
+                  Mapper.
+                </small>
+              </small>
+              <button mat-icon-button matSuffix (click)="changeScreen('reg')">
+                <mat-icon>{{ "visibility" }}</mat-icon>
+              </button>
+            </mat-form-field>
+            <!-- <mat-form-field appearance="fill">
+              <mat-label>Internal Authentication</mat-label>
+              <input matInput placeholder="true" formControlName="internalAuth" />
+ </mat-form-field> -->
+            <mat-form-field appearance="fill">
+              <mat-label> Blocked Account Check</mat-label>
+              <input
+                matInput
+                placeholder="true"
+                formControlName="blockedAccCheck"
+                disabled
+              />
+              <small>
+                <small>
+                  To check if the User is blocked, we look at the
+                  <strong>
+                    {{
+                      ussdConfigDataForm["controls"]["blockedAccCheck"].value
+                    }}
+                  </strong>
+                  Mapper.
+                </small>
+              </small>
+              <button mat-icon-button matSuffix (click)="changeScreen('block')">
+                <mat-icon>{{ "visibility" }}</mat-icon>
+              </button>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label> First Login Check</mat-label>
+              <input
+                matInput
+                placeholder="true"
+                formControlName="firstLoginCheck"
+                disabled
+              />
+              <small>
+                <small>
+                  To check if it's the first-time the User is logging in, we
+                  look at the
+                  <strong>
+                    {{
+                      ussdConfigDataForm["controls"]["firstLoginCheck"].value
+                    }}
+                  </strong>
+                  Mapper.
+                </small>
+              </small>
+              <button mat-icon-button matSuffix (click)="changeScreen('ftl')">
+                <mat-icon>{{ "visibility" }}</mat-icon>
+              </button>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label> Imsi Check</mat-label>
+              <input
+                matInput
+                placeholder="true"
+                formControlName="imsiCheck"
+                disabled
+              />
+              <small>
+                <small>
+                  To check if the User's imsi check has failed, we look at the
+                  <strong>
+                    {{ ussdConfigDataForm["controls"]["imsiCheck"].value }}
+                  </strong>
+                  Mapper.
+                </small>
+              </small>
+              <button mat-icon-button matSuffix (click)="changeScreen('imsi')">
+                <mat-icon>{{ "visibility" }}</mat-icon>
+              </button>
+            </mat-form-field>
+          </form>
+
+          <div class="mobile">
+            <div class="phone">
+              <div class="phone-mirror">
+                <div class="topWrapper">
+                  <div class="camera"></div>
+                  <div class="line-rec"></div>
+                </div>
+
+                <ng-container>
+                  <div
+                    class="text-overlay"
+                    *ngIf="responsePrompt$ | async as response"
+                  >
+                    <div class="header">
+                      <div class="example-box-prompt">
+                        <a class="d-flex"
+                          ><i
+                            nzTooltipTitle="Add New Step"
+                            nzTooltipPlacement="rightTop"
+                            nz-tooltip
+                            nz-icon
+                            nzType="plus-circle"
+                            nzTheme="outline"
+                            (click)="addNewPromptStep()"
+                          ></i
+                        ></a>
+                      </div>
+
+                      <div class="title">
+                        <small>{{ currentPrompt }}</small>
+                        <strong>
+                          <p>{{ currentPromptTitle }}</p>
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div class="example-list" id="promptList">
+                      <div
+                        class="example-box-prompt"
+                        *ngFor="let prompt of response; let i = index"
+                        [ngStyle]="
+                          i === currentPromptIndex
+                            ? { border: '2px solid #00B722', fontSize: 'small' }
+                            : {
+                                border: '2px solid #c97c57',
+                                fontSize: 'smaller'
+                              }
+                        "
+                        (click)="changePromptTitle(prompt, i)"
+                        id="step_{{ i }}"
+                      >
+                        <span (click)="editPrompt(prompt)"
+                          >{{ i + 1 }}: {{ prompt["title"] }}</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Mappers">
+        <form class="customForm" [formGroup]="ussdLookupForm">
+          <mat-form-field appearance="fill" class="smallField">
+            <mat-label>Type</mat-label>
+            <mat-select
+              name="mapper"
+              formControlName="selectedMapper"
+              (selectionChange)="checkMapper($event)"
+            >
+              <mat-option
+                *ngFor="let mapper of adapterMappers"
+                [value]="mapper"
+              >
+                {{ mapper }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+
+        <div class="serverTable">
+          <div class="d-flex justify-content-between mb-1 align-items-center">
+            <mat-form-field appearance="standard">
+              <mat-label>Filter</mat-label>
+              <input
+                matInput
+                (keyup)="applyFilter($event, 'mappers')"
+                placeholder="..."
+                #input
+              />
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="addMapperObj()"
+              class="addRuleBtn"
+            >
+              Add New Mapper
+            </button>
+          </div>
+
+          <table
+            mat-table
+            [dataSource]="mappersDataSource"
+            class="mat-elevation-z8"
+          >
+            <ng-container matColumnDef="key">
+              <th mat-header-cell *matHeaderCellDef>Key</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element["keyName"] }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef>Value</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element["keyValue"] }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="inAccDtl">
+              <th mat-header-cell *matHeaderCellDef>In Account Details</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element["inAccDtl"] }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td
+                class="actionRow"
+                mat-cell
+                *matCellDef="let element"
+                class="action-link"
+              >
+                <button
+                  mat-icon-button
+                  matTooltip="Edit"
+                  (click)="editMapperObj(element)"
+                >
+                  <mat-icon class="edit">edit</mat-icon>
+                </button>
+
+                <!-- <button
+                  mat-icon-button
+                  matTooltip="Delete"
+                  (click)="removeMapperObj(element)"
+                >
+                  <mat-icon class="delete">delete</mat-icon>
+                </button> -->
+              </td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="mappersDisplayedColumns; sticky: true"
+            ></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: mappersDisplayedColumns"
+            ></tr>
+          </table>
+
+          <mat-paginator
+            #mapperPaginator="matPaginator"
+            [pageSize]="5"
+            [pageSizeOptions]="[5, 10, 20]"
+            showFirstLastButtons
+            aria-label="Select page of periodic elements"
+          >
+          </mat-paginator>
+        </div>
+      </mat-tab>
+      <mat-tab label="Rules">
+        <div class="serverTable">
+          <div class="d-flex justify-content-between mb-1 align-items-center">
+            <mat-form-field appearance="standard">
+              <mat-label>Filter</mat-label>
+              <input
+                matInput
+                (keyup)="applyFilter($event)"
+                placeholder="..."
+                #input
+              />
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="addRule()"
+              class="h-1"
+            >
+              Add New Rule
+            </button>
+          </div>
+
+          <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element["name"] }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="path">
+              <th mat-header-cell *matHeaderCellDef>Path</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element["path"] }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="default">
+              <th mat-header-cell *matHeaderCellDef>Default</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element["default"] | json }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="format-as">
+              <th mat-header-cell *matHeaderCellDef>Format As</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element["format-as"] || "NULL" }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="validation">
+              <th mat-header-cell *matHeaderCellDef>Validation</th>
+              <td mat-cell *matCellDef="let element">
+                {{
+                  element["validation"]
+                    ? element["validation"][0]["name"]
+                    : "NULL"
+                }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="matches">
+              <th mat-header-cell *matHeaderCellDef>Matches</th>
+              <td mat-cell *matCellDef="let element">
+                {{
+                  element["matches"] ? element["matches"][0]["code"] : "NULL"
+                }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td
+                class="actionRow"
+                mat-cell
+                *matCellDef="let element"
+                class="action-link"
+              >
+                <button
+                  mat-icon-button
+                  matTooltip="Edit"
+                  (click)="editRule(element)"
+                >
+                  <mat-icon class="edit">edit</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  matTooltip="Delete"
+                  (click)="removeRule(element)"
+                >
+                  <mat-icon class="delete">delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="displayedColumns; sticky: true"
+            ></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+
+          <mat-paginator
+            #paginator="matPaginator"
+            [pageSize]="5"
+            [pageSizeOptions]="[5, 10, 20]"
+            showFirstLastButtons
+            aria-label="Select page of periodic elements"
+          >
+          </mat-paginator>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</ng-container>

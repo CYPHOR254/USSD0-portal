@@ -1,0 +1,53 @@
+    <div class="flex-container">
+      <h2>
+        <span>{{ title }}</span>
+      </h2>
+      <button mat-button class="close-icon" [mat-dialog-close]="true">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <form class="rulesForm" [formGroup]="ussdLookupStatusForm">
+      
+  
+      <div>
+        <mat-form-field appearance="fill">
+          <mat-label>Code</mat-label>
+          <input matInput formControlName="code" />
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Code Type</mat-label>
+          <mat-select formControlName="codeType">
+            <mat-option
+              *ngFor="let type of ['string', 'number', 'boolean']"
+              [value]="type"
+            >
+              {{ type }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option
+              *ngFor="let state of data['mappersArray']"
+              [value]="state"
+            >
+              {{ state }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+  
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="addEditLookupStatus()"
+        class="addRuleBtn"
+        [disabled]="ussdLookupStatusForm.invalid"
+      >
+        {{ title }}
+      </button>
+    </form>
+
+  

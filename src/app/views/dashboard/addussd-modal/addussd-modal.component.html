@@ -1,0 +1,24 @@
+<div>
+
+    <h2 mat-dialog-title>Create New USSD</h2>
+    <mat-dialog-content class="mat-typography" [formGroup]="addUSSDForm">
+    
+      <p>
+        <mat-form-field appearance="fill">
+          <mat-label>Fill in USSD name</mat-label>
+          <input matInput formControlName="ussdName" placeholder="ussdName" />
+        </mat-form-field>
+      </p>
+    
+    </mat-dialog-content>
+    
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button class="primary" (click)="createNewUssdConfig()" cdkFocusInitial>Create</button>
+    </mat-dialog-actions>
+    </div>
+    
+    <div *ngIf="createConfig$ | async as resp">
+      <h1>{{ resp.msg }}</h1>
+    </div>
+    

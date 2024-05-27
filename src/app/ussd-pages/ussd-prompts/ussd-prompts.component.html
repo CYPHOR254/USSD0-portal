@@ -1,0 +1,40 @@
+<div style="display: flex; justify-content: space-between">
+  <div
+    style="height: 475px; overflow: auto; width: 25%"
+    *ngIf="existingPrompts$ | async as list"
+  >
+    <input type="text" (keyup)="filterPromptSteps($event)" />
+    <p *ngFor="let item of list" [id]="item" (click)="getPromptSteps(item)">
+      {{ item }}
+    </p>
+  </div>
+  <div
+    style="
+      width: 72%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      overflow-y: auto;
+      height: fit-content;
+    "
+    *ngIf="promptSteps$ | async as steps"
+  >
+    <mat-card class="card2" *ngFor="let item of steps">
+      <mat-card-header>
+        <nz-tag class="tag" style="height: 20px" [nzColor]="'green'">
+          {{ item["type"] }}
+        </nz-tag>
+      </mat-card-header>
+
+      <mat-card-content>{{ item["name"] }}</mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="editStep(item)">
+          Edit
+        </button>
+        <button mat-raised-button color="warn" (click)="deleteStep(item)">Delete</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <div><button (click)="addStep()">Add Step</button></div>
+  </div>
+</div>

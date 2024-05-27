@@ -1,0 +1,61 @@
+<div>
+
+<h2 mat-dialog-title>{{ title }}</h2>
+<mat-dialog-content class="mat-typography" [formGroup]="redisConnectForm">
+
+  <p>
+    <mat-form-field appearance="fill">
+      <mat-label>Fill in Redis IP</mat-label>
+      <input matInput formControlName="ip" placeholder="Redis IP Address" />
+      <small
+      *ngIf="
+        redisConnectForm.controls['ip'].invalid &&
+        (redisConnectForm.controls['ip'].dirty ||
+          redisConnectForm.controls['ip'].touched)
+      "
+      class="formErrors"
+    >
+      <small *ngIf="redisConnectForm.controls['ip'].errors.required">
+        IP Address is required
+      </small>
+      <small *ngIf="redisConnectForm.controls['ip'].errors.pattern">
+        IP Address provided is invalid
+      </small>
+    </small>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field appearance="fill">
+      <mat-label>Fill in  Redis Port</mat-label>
+      <input matInput formControlName="port" placeholder="Redis Port" />
+      <small
+      *ngIf="
+        redisConnectForm.controls['port'].invalid &&
+        (redisConnectForm.controls['port'].dirty ||
+          redisConnectForm.controls['port'].touched)
+      "
+      class="formErrors"
+    >
+      <small
+        *ngIf="redisConnectForm.controls['port'].errors.required"
+      >
+        Port Number is required
+      </small>
+    </small>
+    </mat-form-field>
+  </p>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button class="primary" (click)="handleOk()" cdkFocusInitial>Submit</button>
+</mat-dialog-actions>
+</div>
+
+<div *ngIf="addConn$ | async as resp">
+  <h1>{{ resp.msg }}</h1>
+</div>
+<div *ngIf="editConn$ | async as resp">
+  <h1>{{ resp.msg }}</h1>
+</div>

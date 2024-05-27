@@ -1,0 +1,66 @@
+form {
+  mat-form-field {
+    width: 13%;
+    margin: 0 2px;
+  }
+
+  .addServerBtn {
+    margin: 0 10px;
+  }
+}
+
+.serverTable {
+  border: 2px solid #3f51b5;
+  padding: 1rem;
+  margin-top: 2px;
+  /* max-height: 165px; */
+  overflow-x: auto;
+  border-radius: 5px;
+
+  table {
+    width: 100%;
+    color: #23282c;
+
+    tr:nth-of-type(odd) {
+      background: rgb(220, 215, 215);
+    }
+
+    th,
+    td {
+      color: black;
+      text-align: center;
+    }
+
+    td {
+      border-right: 1px solid #000;
+      font-size: x-small;
+      padding: 1px;
+    }
+
+    th {
+      background: #3f51b5;
+      text-transform: uppercase;
+      color: white;
+      padding-bottom: 1rem;
+    }
+
+    .actionRow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: row;
+    }
+
+    mat-icon {
+      font-size: 1rem;
+    }
+
+    .edit {
+      color: blue;
+    }
+
+    .delete {
+      color: red;
+    }
+  }
+}

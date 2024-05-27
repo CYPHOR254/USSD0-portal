@@ -1,0 +1,235 @@
+<h1>Welcome to the USSD Creation Experience</h1>
+<h2>Pick an option below</h2>
+
+<div class="d-flex justify-content-around">
+  <div class="serverTable" *ngIf=" !connectedToRedis && listConnections$ | async">
+    <button
+      mat-raised-button
+      color="primary"
+      class="addServerBtn float-right mb-3"
+      (click)="addConnection()"
+      *ngIf="listConnections$ | async"
+    >
+      Add Connection
+    </button>
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <ng-container matColumnDef="ip">
+        <th mat-header-cell *matHeaderCellDef>ip</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.redisIp }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="port">
+        <th mat-header-cell *matHeaderCellDef>port</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.redisPort }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td
+          class="actionRow"
+          mat-cell
+          *matCellDef="let element"
+          class="action-link"
+        >
+          <button mat-icon-button matTooltip="add" (click)="populateConn(element)">
+            <mat-icon class="add">add</mat-icon>
+          </button>
+
+          <button mat-icon-button matTooltip="Edit" (click)="editConn(element)">
+            <mat-icon class="edit">edit</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            matTooltip="Delete"
+            (click)="removeConn(element)"
+          >
+            <mat-icon class="delete">delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <div class="context">
+    <ng-container *ngIf="!connectedToRedis">
+      <mat-card class="card2">
+        <mat-card-header>
+          <!-- <div mat-card-avatar class="example-header-image"></div> -->
+          <mat-card-title
+            >Connect to REDIS DB to select an existing USSD to
+            edit</mat-card-title
+          >
+          <mat-card-subtitle>Connect to REDIS</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <form class="redis-container" [formGroup]="redisConnectForm">
+            <mat-form-field appearance="fill">
+              <mat-label>Redis IP Address</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="ip"
+                placeholder="127.0.0.1/192.168.100.22"
+              />
+              <small
+                *ngIf="
+                  redisConnectForm.controls['ip'].invalid &&
+                  (redisConnectForm.controls['ip'].dirty ||
+                    redisConnectForm.controls['ip'].touched)
+                "
+                class="formErrors"
+              >
+                <small *ngIf="redisConnectForm.controls['ip'].errors.required">
+                  IP Address is required
+                </small>
+                <small *ngIf="redisConnectForm.controls['ip'].errors.pattern">
+                  IP Address provided is invalid
+                </small>
+              </small>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Redis Port</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="port"
+                placeholder="6379/6277/6824"
+              />
+              <small
+                *ngIf="
+                  redisConnectForm.controls['port'].invalid &&
+                  (redisConnectForm.controls['port'].dirty ||
+                    redisConnectForm.controls['port'].touched)
+                "
+                class="formErrors"
+              >
+                <small
+                  *ngIf="redisConnectForm.controls['port'].errors.required"
+                >
+                  Port Number is required
+                </small>
+              </small>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Redis DB</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="db"
+                placeholder="0/1/2/3/4/5"
+                value=""
+              />
+              <small
+                *ngIf="
+                  redisConnectForm.controls['db'].invalid &&
+                  (redisConnectForm.controls['db'].dirty ||
+                    redisConnectForm.controls['db'].touched)
+                "
+                class="formErrors"
+              >
+                <small *ngIf="redisConnectForm.controls['db'].errors.required">
+                  DB Number is required
+                </small>
+                <small *ngIf="redisConnectForm.controls['db'].errors.max">
+                  DB Number cannot exceed 15
+                </small>
+              </small>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                formControlName="password"
+                [type]="hide ? 'password' : 'text'"
+                value=""
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                (click)="hide = !hide"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hide"
+              >
+                <mat-icon>{{
+                  hide ? "visibility_off" : "visibility"
+                }}</mat-icon>
+              </button>
+            </mat-form-field>
+          </form>
+        </mat-card-content>
+        <mat-card-actions>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="connectToRedis()"
+            [disabled]="redisConnectForm.invalid"
+          >
+            Connect to REDIS
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </ng-container>
+
+    
+    <ng-container *ngIf="(redisConnect$ | async) && isRedisConnected">
+      <mat-card
+      class="card3"
+      *ngIf="connectedToRedis && !fetchConfigs$"
+      >
+      <div class="d-flex justify-content-end mb-2">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="createNewUssdConfig()"
+          id="proceedBtn"
+        >
+          Create New USSD
+        </button>
+      </div>
+        <mat-card-header>
+          <mat-card-title>Select a USSD Application</mat-card-title>
+          <mat-card-subtitle>Edit USSD</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field appearance="fill">
+            <mat-label>App Name</mat-label>
+            <mat-select [formControl]="ussdApps">
+              <mat-option *ngFor="let appName of appNames" [value]="appName">{{
+                appName
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <button
+            mat-raised-button
+            *ngIf="appNames.length > 0"
+            color="primary"
+            (click)="fetchUSSDConfigs()"
+            id="proceedBtn"
+          >
+            Proceed to edit the USSD Configs
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <ng-container *ngIf="fetchConfigs$ | async">
+        <h2>
+          Redirecting to the setup page. Configuration files are being loaded...
+        </h2>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>

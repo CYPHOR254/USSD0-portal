@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  app:
+    image: devops-registry.ekenya.co.ke/configurable-ussd/configurable-ussd-portal:latest
+    ports:
+      - 4200:80
+    depends_on:
+      - backend
+    restart: always
+
+  backend:
+    image: devops-registry.ekenya.co.ke/configurable-ussd/configurable-ussd-backend:latest
+    environment:
+      - PORT=6688
+    ports:
+      - 6688:6688
+    restart: always

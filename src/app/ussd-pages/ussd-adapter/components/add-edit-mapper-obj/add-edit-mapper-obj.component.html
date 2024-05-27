@@ -1,0 +1,49 @@
+<div class="flex-container">
+    <h2>
+      <span>{{ title }}</span>
+    </h2>
+    <button mat-button class="close-icon" [mat-dialog-close]="true">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <form class="rulesForm" [formGroup]="ussdMapperObjForm">
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Key Name</mat-label>
+        <input matInput formControlName="keyName" />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Key Value</mat-label>
+        <mat-select formControlName="keyValue">
+          <mat-option
+            *ngFor="let rule of data['adapterRulesArr']"
+            [value]="rule"
+          >
+            {{ rule }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Is In Account Details</mat-label>
+        <mat-select formControlName="inAccDtl">
+          <mat-option
+            *ngFor="let state of [true, false]"
+            [value]="state"
+          >
+            {{ state }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="addMatchesObjStatus()"
+      class="addRuleBtn"
+      [disabled]="ussdMapperObjForm.invalid"
+    >
+      {{ title }}
+    </button>
+  </form>
+

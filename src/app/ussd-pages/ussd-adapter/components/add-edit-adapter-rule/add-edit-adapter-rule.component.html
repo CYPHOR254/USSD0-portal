@@ -1,0 +1,229 @@
+<div class="mainCont" *ngIf="allData$ | async">
+  <div class="flex-container">
+    <h2>
+      <span>{{ title }}</span>
+    </h2>
+    <button mat-button class="close-icon" [mat-dialog-close]="true">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <form class="rulesForm" [formGroup]="ussdRulesForm">
+    <section class="checkbox-section">
+      <p>
+        <mat-checkbox
+          formControlName="hasValidation"
+          (change)="toggleValidation($event)"
+          >Has Validation</mat-checkbox
+        >
+      </p>
+      <p>
+        <mat-checkbox
+          formControlName="hasMatches"
+          (change)="toggleMatches($event)"
+          >Matches Response</mat-checkbox
+        >
+      </p>
+    </section>
+
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Rule Name</mat-label>
+        <input matInput formControlName="name" />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Rule Path</mat-label>
+        <input matInput formControlName="path" />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Default Value</mat-label>
+        <input matInput formControlName="default" />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Format As</mat-label>
+        <input matInput formControlName="formatAs" />
+      </mat-form-field>
+
+      <div class="d-flex justify-content-between">
+        <div *ngIf="validationStatus" class="extraCont">
+          <hr />
+          <h4>Validation Options</h4>
+          <mat-form-field appearance="fill">
+            <mat-label>Validation Name</mat-label>
+            <input matInput formControlName="validationName" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Validation Type</mat-label>
+            <input matInput formControlName="validationType" />
+          </mat-form-field>
+          <button
+            mat-icon-button
+            matTooltip="Add Validation"
+            (click)="addValidation()"
+          >
+            <mat-icon class="add">add</mat-icon>
+          </button>
+
+          <div class="serverTable">
+            <!-- <mat-form-field appearance="standard">
+                <mat-label>Filter</mat-label>
+                <input
+                  matInput
+                  (keyup)="applyFilter($event)"
+                  placeholder="..."
+                  #input
+                />
+              </mat-form-field> -->
+
+            <table
+              mat-table
+              [dataSource]="validationSource"
+              class="mat-elevation-z8"
+            >
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element["name"] }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element["type"] }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td
+                  class="actionRow"
+                  mat-cell
+                  *matCellDef="let element"
+                  class="action-link"
+                >
+                  <button
+                    mat-icon-button
+                    matTooltip="Edit"
+                    (click)="editValidation(element)"
+                  >
+                    <mat-icon class="edit">edit</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    matTooltip="Delete"
+                    (click)="removeValidation(element)"
+                  >
+                    <mat-icon class="delete">delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="validationDisplayedColumns; sticky: true"
+              ></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: validationDisplayedColumns"
+              ></tr>
+            </table>
+          </div>
+        </div>
+
+        <div *ngIf="matchesStatus" class="extraCont">
+          <hr />
+          <h4>Match Response</h4>
+          <mat-form-field appearance="fill">
+            <mat-label>Matches Code</mat-label>
+            <input matInput formControlName="matchesCode" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Response Status</mat-label>
+            <input matInput formControlName="matchesStatus" />
+          </mat-form-field>
+          <button mat-icon-button matTooltip="Add Match" (click)="addMatches()">
+            <mat-icon class="add">add</mat-icon>
+          </button>
+
+          <div class="serverTable">
+            <!-- <mat-form-field appearance="standard">
+                <mat-label>Filter</mat-label>
+                <input
+                  matInput
+                  (keyup)="applyFilter($event)"
+                  placeholder="..."
+                  #input
+                />
+              </mat-form-field> -->
+
+            <table
+              mat-table
+              [dataSource]="matchesSource"
+              class="mat-elevation-z8"
+            >
+              <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef>Code</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element["code"] }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element["status"] }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td
+                  class="actionRow"
+                  mat-cell
+                  *matCellDef="let element"
+                  class="action-link"
+                >
+                  <button
+                    mat-icon-button
+                    matTooltip="Edit"
+                    (click)="editMatches(element)"
+                  >
+                    <mat-icon class="edit">edit</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    matTooltip="Delete"
+                    (click)="removeMatches(element)"
+                  >
+                    <mat-icon class="delete">delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr
+                mat-header-row
+                *matHeaderRowDef="matchesDisplayedColumns; sticky: true"
+              ></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: matchesDisplayedColumns"
+              ></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="addEditRule()"
+      class="addRuleBtn"
+      [disabled]="ussdRulesForm.invalid"
+    >
+      {{ title }}
+    </button>
+  </form>
+</div>

@@ -1,0 +1,28 @@
+.mainCont {
+  overflow-y: auto;
+
+  .rulesForm {
+    display: flex;
+    flex-direction: column;
+
+    .rulesCont {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-bottom: 1px solid;
+    }
+
+    .checkbox-section {
+      justify-content: flex-start !important;
+    }
+
+    .extraCont {
+      width: 45%;
+      padding: 5px;
+
+      .mat-form-field {
+        width: 42%;
+      }
+    }
+  }
+}

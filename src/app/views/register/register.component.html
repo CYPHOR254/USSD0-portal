@@ -1,0 +1,208 @@
+<div class="registerBody">
+  <div class="content">
+    <mat-card-content>
+      <h2>Register for the USSD Portal</h2>
+      <form [formGroup]="registerForm">
+        <mat-form-field appearance="fill">
+          <mat-label>First Name</mat-label>
+          <input
+            matInput
+            placeholder="Enter your First Name"
+            name="fname"
+            formControlName="fname"
+            type="text"
+          />
+          <small
+            *ngIf="
+              registerForm.controls['fname'].invalid &&
+              (registerForm.controls['fname'].dirty ||
+                registerForm.controls['fname'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="registerForm.controls['fname'].errors.required">
+              First Name is required
+            </small>
+            <small *ngIf="registerForm.controls['fname'].errors.minlength">
+              First Name provided is too short
+            </small>
+          </small>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Last Name</mat-label>
+          <input
+            matInput
+            placeholder="Enter your Last Name"
+            name="lname"
+            formControlName="lname"
+            type="text"
+          />
+          <small
+            *ngIf="
+              registerForm.controls['lname'].invalid &&
+              (registerForm.controls['lname'].dirty ||
+                registerForm.controls['lname'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="registerForm.controls['lname'].errors.required">
+              Last Name is required
+            </small>
+            <small *ngIf="registerForm.controls['lname'].errors.minlength">
+              Last Name provided is too short
+            </small>
+          </small>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Phone Number</mat-label>
+          <input
+            matInput
+            placeholder="Enter your phone number"
+            name="mobile"
+            formControlName="mobile"
+            type="text"
+          />
+          <small
+            *ngIf="
+              registerForm.controls['mobile'].invalid &&
+              (registerForm.controls['mobile'].dirty ||
+                registerForm.controls['mobile'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="registerForm.controls['mobile'].errors.required">
+              Phone Number is required
+            </small>
+            <small *ngIf="registerForm.controls['mobile'].errors.minlength">
+              Phone Number provided is too short
+            </small>
+          </small>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            placeholder="Enter your email"
+            name="email"
+            formControlName="email"
+          />
+          <small
+            *ngIf="
+              registerForm.controls['email'].invalid &&
+              (registerForm.controls['email'].dirty ||
+                registerForm.controls['email'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="registerForm.controls['email'].errors.required">
+              Email is required
+            </small>
+            <small
+              *ngIf="
+                registerForm.controls['email'].errors.email ||
+                registerForm.controls['email'].errors.pattern
+              "
+            >
+              Email provided is invalid
+            </small>
+          </small>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            placeholder="Enter your password"
+            name="password"
+            type="password"
+            formControlName="password"
+            autocomplete="off"
+          />
+          <small
+            *ngIf="
+              registerForm.controls['password'].invalid &&
+              (registerForm.controls['password'].dirty ||
+                registerForm.controls['password'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="registerForm.controls['password'].errors.required">
+              Password is required
+            </small>
+            <small *ngIf="registerForm.controls['password'].errors.minlength">
+              Password provided is too short
+            </small>
+            <small *ngIf="registerForm.controls['password'].errors.match_error">
+              Passwords do not match
+            </small>
+          </small>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Confirm Password</mat-label>
+          <input
+            matInput
+            placeholder="Confirm your password"
+            name="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            autocomplete="off"
+          />
+          <small
+            *ngIf="
+              registerForm.controls['confirmPassword'].invalid &&
+              (registerForm.controls['confirmPassword'].dirty ||
+                registerForm.controls['confirmPassword'].touched)
+            "
+            class="formErrors"
+          >
+            <small
+              *ngIf="registerForm.controls['confirmPassword'].errors.required"
+            >
+              Confirm Password is required
+            </small>
+            <small
+              *ngIf="registerForm.controls['confirmPassword'].errors.minlength"
+            >
+              Confirm Password provided is too short
+            </small>
+          </small>
+          <br />
+          <small
+            *ngIf="
+              registerForm.errors?.mismatch &&
+              (registerForm.controls['confirmPassword'].dirty ||
+                registerForm.controls['confirmPassword'].touched)
+            "
+            class="formErrors"
+          >
+            Passwords do not match.
+          </small>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="registerForm.invalid"
+          (click)="submit()"
+        >
+          Submit
+        </button>
+      </form>
+    </mat-card-content>
+  </div>
+
+  <div class="circle" style="animation-delay: 0s"></div>
+  <div class="circle" style="animation-delay: 1s"></div>
+  <div class="circle" style="animation-delay: 2s"></div>
+  <div class="circle" style="animation-delay: 3s"></div>
+  <div class="circle" style="animation-delay: 4s"></div>
+</div>
+
+<div class="content" *ngIf="obsv$ | async as resp">
+  <h1>{{ resp.msg }}</h1>
+</div>

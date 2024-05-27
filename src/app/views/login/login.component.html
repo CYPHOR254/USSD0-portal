@@ -1,0 +1,83 @@
+<div class="loginBody">
+  <div class="content">
+    <mat-card-content>
+      <h2>Login Into the USSD Portal</h2>
+      <form [formGroup]="loginForm">
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            placeholder="Enter your email"
+            name="email"
+            formControlName="email"
+            autocomplete="off"
+          />
+          <small
+            *ngIf="
+              loginForm.controls['email'].invalid &&
+              (loginForm.controls['email'].dirty ||
+                loginForm.controls['email'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="loginForm.controls['email'].errors.required">
+              Email is required
+            </small>
+            <small
+              *ngIf="
+                loginForm.controls['email'].errors.email ||
+                loginForm.controls['email'].errors.pattern
+              "
+            >
+              Email provided is invalid
+            </small>
+          </small>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            placeholder="Enter your password"
+            name="password"
+            type="password"
+            formControlName="password"
+            autocomplete="off"
+            [type]="hide ? 'password' : 'text'"
+          />
+          <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+            <mat-icon>{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
+          </button>
+          <small
+            *ngIf="
+              loginForm.controls['password'].invalid &&
+              (loginForm.controls['password'].dirty ||
+                loginForm.controls['password'].touched)
+            "
+            class="formErrors"
+          >
+            <small *ngIf="loginForm.controls['password'].errors.required">
+              Password is required
+            </small>
+            <small *ngIf="loginForm.controls['password'].errors.minlength">
+              Password provided is too short
+            </small>
+          </small>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="submit()">
+          Submit
+        </button>
+      </form>
+    </mat-card-content>
+  </div>
+
+  <div class="circle" style="animation-delay: 0s"></div>
+  <div class="circle" style="animation-delay: 1s"></div>
+  <div class="circle" style="animation-delay: 2s"></div>
+</div>
+
+<div *ngIf="obsv$ | async as resp">
+  <h1>{{ resp.msg }}</h1>
+</div>

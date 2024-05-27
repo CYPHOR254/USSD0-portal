@@ -1,0 +1,66 @@
+.customForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  mat-form-field {
+    width: 25%;
+    margin: 0 3px;
+  }
+
+  .smallField {
+    width: 15%;
+  }
+}
+
+.customFormB {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  mat-form-field {
+    width: 20%;
+    margin: 0 3px;
+  }
+}
+
+.customForm,
+.customFormB {
+  .addCustomOptionBtn {
+    margin: 0 10px;
+    height: 30px;
+  }
+}
+
+button {
+  // margin: 0 10px;
+  height: 30px !important;
+}
+
+.checkbox-section {
+  justify-content: space-evenly !important;
+  width: fit-content;
+
+  p {
+    margin: 0 10px;
+  }
+}
+
+::ng-deep .mat-option {
+  font-size: smaller;
+}
+
+::ng-deep .mat-form-field-flex > .mat-form-field-infix {
+  padding: 0.3em 2px !important;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    &:focus {
+      outline: none !important;
+    }
+  }
+}

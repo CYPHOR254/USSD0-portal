@@ -1,0 +1,29 @@
+<div *ngIf="allData$ | async">
+  <h4>Edit your Config Metadata</h4>
+  <form [formGroup]="configForm">
+    <ng-container *ngFor="let key of metadataKeys$ | async">
+      <mat-form-field appearance="fill">
+        <mat-label>{{ key.replace("-", " ").toUpperCase() }}</mat-label>
+        <input matInput [formControlName]="key" placeholder="..." />
+      </mat-form-field>
+    </ng-container>
+  </form>
+
+  <hr />
+
+  <h4>Edit your API Metadata</h4>
+  <form [formGroup]="apiMetadataForm">
+    <ng-container *ngFor="let key of apiMetadataKeys$ | async">
+      <mat-form-field appearance="fill">
+        <mat-label>{{ key.toUpperCase() }}</mat-label>
+        <input matInput [formControlName]="key" placeholder="..." />
+      </mat-form-field>
+    </ng-container>
+  </form>
+
+  <div>
+    <button mat-raised-button color="primary" (click)="submit()">
+      Submit Metadata Information
+    </button>
+  </div>
+</div>

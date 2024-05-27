@@ -1,0 +1,31 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: create a server directory if it does not exist
+      ansible.builtin.file:
+        path: /srv/configurable-ussd
+        state: directory
+        mode: '0755'
+      become: true
+
+    - name: copy compose file to server
+      ansible.builtin.copy:
+        src: '{{item}}'
+        dest: /srv/configurable-ussd
+        owner: mlusengeri
+        group: mlusengeri
+        mode: '0644'
+      become: true
+      loop:
+        - docker-compose.yml
+
+    - name: start new version of container
+      ansible.builtin.shell: |
+        docker compose --env-file .env up -d --pull=always
+      args:
+        chdir: /srv/configurable-ussd
+    
+    - name: notify gitlab of deployment success
+      ansible.builtin.shell: |       
+        curl --data "environment={{ tower_webhook_payload['deploy_environment'] }}&sha={{ tower_webhook_payload['ci_commit_sha'] }}&ref={{ tower_webhook_payload['deploy_branch'] }}&tag=false&status=success" --header "PRIVATE-TOKEN: {{gitlabToken}}" "https://vs.ekenya.co.ke:1126/api/v4/projects/281/deployments"
