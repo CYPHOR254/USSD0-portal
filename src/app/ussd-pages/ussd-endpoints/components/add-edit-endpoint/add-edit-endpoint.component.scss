@@ -49,3 +49,26 @@
     }
   }
   
+  .scrollable-container {
+    max-height: 90vh; /* Adjust the height as needed */
+    overflow-y: auto;
+  }
+  
+  .json-card {
+    max-height: 300px;
+    overflow: auto;
+    margin-top: 20px;
+  }
+  
+  .json-card-content {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .json-textarea {
+    width: 100%;
+    resize: none;
+  }
+  
+  
+  

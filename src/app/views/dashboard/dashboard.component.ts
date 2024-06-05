@@ -125,7 +125,7 @@ export class DashboardComponent implements OnInit {
             this.redisConnectForm.reset();
           } else {
             // this.errorMsg = `Error: ${error.message}`;
-            this.toastrService.error(this.errorMsg, "redis is not conneted check connection nd try again");
+            this.toastrService.error(this.errorMsg, "redis is not conneted check connection and try again");
             this.redisConnectForm.reset();
           }
           return of([]);

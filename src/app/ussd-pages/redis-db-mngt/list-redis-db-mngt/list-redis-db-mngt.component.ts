@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { HttpService } from '../../../shared/services/http-service.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AddEditRedisDbMngtComponent } from '../add-edit-redis-db-mngt/add-edit-redis-db-mngt.component';
+// import { AddEditRedisDbMngtComponent } from '../add-edit-redis-db-mngt/add-edit-redis-db-mngt.component';
 
 
 @Component({
@@ -69,27 +69,27 @@ export class ListRedisDbMngtComponent implements OnInit {
     )
   }
 
-  addRedisdb() {
-    let dialogRef = this.dialog.open(AddEditRedisDbMngtComponent, {});
+  // addRedisdb() {
+  //   let dialogRef = this.dialog.open(AddEditRedisDbMngtComponent, {});
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadData();
-      this.ref.detectChanges();
-    })
-  }
+  //   dialogRef.afterClosed().subscribe(() => {
+  //     this.loadData();
+  //     this.ref.detectChanges();
+  //   })
+  // }
 
-  editRedisdb(element) {
-    let dialogRef = this.dialog.open(AddEditRedisDbMngtComponent, {
-      data: {
-        userData: element,
-      },
-    });
-    dialogRef.afterClosed().subscribe(() => {
-      this.listRedisdbMngt$ = null;
-      this.loadData();
-      this.ref.detectChanges();
-    });
-  }
+  // editRedisdb(element) {
+  //   let dialogRef = this.dialog.open(AddEditRedisDbMngtComponent, {
+  //     data: {
+  //       userData: element,
+  //     },
+  //   });
+  //   dialogRef.afterClosed().subscribe(() => {
+  //     this.listRedisdbMngt$ = null;
+  //     this.loadData();
+  //     this.ref.detectChanges();
+  //   });
+  // }
 
   removeRedisdb(element: any) {
     const model = {

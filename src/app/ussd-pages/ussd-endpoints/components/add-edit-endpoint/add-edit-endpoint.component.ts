@@ -16,63 +16,49 @@ import { HandleUssdJsonService } from "../../../../shared/services/handle-ussd-j
 export class AddEditEndpointComponent implements OnInit {
   formTitle: string;
   endpointForm: FormGroup;
-
   allData$: Observable<Record<string, string>>;
   allData: Record<string, string>;
-
   serversArray = [];
-
   dataSource: MatTableDataSource<Record<string, string>[]> =
     new MatTableDataSource<Record<string, string>[]>([]);
   displayedColumns: string[] = ["name", "value", "action"];
-
   rgDataSource: MatTableDataSource<Record<string, string>[]> =
     new MatTableDataSource<Record<string, string>[]>([]);
   requestObjArray = [];
-
   custHeadersFlag: boolean;
   hasRequestGroup: boolean = false;
-
   headersDataSource: MatTableDataSource<Record<string, string>[]> =
     new MatTableDataSource<Record<string, string>[]>([]);
   custHeadersArray = [];
   headersArray = [
-    "A-IM",
-    "Accept",
-    "Accept-Charset",
-    "Accept-Encoding",
-    "Accept-Language",
-    "Accept-Datetime",
-    "Access-Control-Request-Method",
-    "Access-Control-Request-Headers",
-    "Authorization",
-    "Cache-Control",
-    "Connection",
-    "Content-Length",
-    "Content-Type",
-    "Cookie",
-    "Date",
-    "Expect",
-    "Forwarded",
-    "From",
-    "Host",
-    "If-Match",
-    "If-Modified-Since",
-    "If-None-Match",
-    "If-Range",
-    "If-Unmodified-Since",
-    "Max-Forwards",
-    "Origin",
-    "Pragma",
-    "Proxy-Authorization",
-    "Range",
-    "Referer",
-    "TE",
-    "User-Agent",
-    "Upgrade",
-    "Via",
-    "Warning",
+    "A-IM", "Accept", "Accept-Charset", "Accept-Encoding", "Accept-Language", 
+    "Accept-Datetime", "Access-Control-Request-Method", "Access-Control-Request-Headers", 
+    "Authorization", "Cache-Control", "Connection", "Content-Length", 
+    "Content-Type", "Cookie", "Date", "Expect", "Forwarded", "From", "Host", 
+    "If-Match", "If-Modified-Since", "If-None-Match", "If-Range", 
+    "If-Unmodified-Since", "Max-Forwards", "Origin", "Pragma", 
+    "Proxy-Authorization", "Range", "Referer", "TE", "User-Agent", "Upgrade", 
+    "Via", "Warning"
   ];
+
+  showJsonCard = false;
+  jsonSnippetText: string = `{
+    "channel_details": {
+        "channel_key": "e737ab200a2140d6be4e482284a1af43",
+        "host": "127.0.0.1",
+        "geolocation": "geolocation",
+        "user_agent_version": "Sumsang",
+        "user_agent": "Android 12",
+        "client_id": "LOMANUSSD",
+        "channel": "USSD",
+        "deviceId": "1cc2a3a5559835b1"
+    },
+    "payload": {
+        "phoneNumber": "254795881812"
+    },
+    "txntimestamp": "2024-03-22T13:00:26",
+    "xref": "130026"
+  }`;
 
   constructor(
     @Inject(MAT_DIALOG_DATA)
@@ -83,7 +69,6 @@ export class AddEditEndpointComponent implements OnInit {
     private dialogRef: MatDialogRef<AddEditEndpointComponent>
   ) {
     this.formTitle = this.endpointData ? "Edit endpoint" : "Add endpoint";
-
     this.endpointForm = new FormGroup({
       name: new FormControl(
         {
@@ -105,18 +90,14 @@ export class AddEditEndpointComponent implements OnInit {
       successValue: new FormControl(
         this.endpointData &&
         this.endpointData["value"]["response"]["status"] !== undefined
-          ? this.endpointData["value"]["response"]["status"]["matches"][0][
-              "code"
-            ]
+          ? this.endpointData["value"]["response"]["status"]["matches"][0]["code"]
           : "",
         [Validators.required]
       ),
       successType: new FormControl(
         this.endpointData &&
         this.endpointData["value"]["response"]["status"] !== undefined
-          ? typeof this.endpointData["value"]["response"]["status"][
-              "matches"
-            ][0]["code"]
+          ? typeof this.endpointData["value"]["response"]["status"]["matches"][0]["code"]
           : "",
         [Validators.required]
       ),
@@ -176,13 +157,10 @@ export class AddEditEndpointComponent implements OnInit {
           this.allData = { ...resp };
           let apiJsonData = resp["api"];
           let apiMainKey: string = Object.keys(apiJsonData)[0];
-
           let serverNames = Object.keys(
             apiJsonData[apiMainKey]["data-sources"]
           );
-
           this.serversArray = [];
-
           serverNames.map((server) => {
             this.serversArray.push({
               ...apiJsonData[apiMainKey]["data-sources"][server],
@@ -220,31 +198,6 @@ export class AddEditEndpointComponent implements OnInit {
         });
       });
       this.dataSource = new MatTableDataSource(this.requestObjArray);
-
-      // if (this.endpointData["value"]["custom-headers"] !== undefined) {
-      //   this.endpointForm.controls["customHeaders"].setValue(true);
-      //   this.custHeadersFlag = true;
-      //   let headerKeys = Object.keys(
-      //     this.endpointData["value"]["custom-headers"]
-      //   );
-      //   this.custHeadersArray = [];
-      //   headerKeys.forEach((key) => {
-      //     this.custHeadersArray.push({
-      //       name: key,
-      //       value: this.endpointData["value"]["custom-headers"][key],
-      //     });
-      //   });
-      //   this.headersDataSource = new MatTableDataSource(this.custHeadersArray);
-      // } else {
-      //   this.endpointForm.controls["customHeaders"].setValue(false);
-      //   this.custHeadersFlag = false;
-      // }
-
-      // if (this.endpointData["value"]["response"]["adapter"] !== undefined) {
-      //   this.endpointForm.controls["adapter"].setValue(
-      //     this.endpointData["value"]["response"]["adapter"]
-      //   );
-      // }
     } else if (
       this.endpointData !== undefined &&
       !!this.endpointData["value"]["request-group"]
@@ -292,27 +245,17 @@ export class AddEditEndpointComponent implements OnInit {
 
   addRequest() {
     if (!this.hasRequestGroup) {
-      console.log(this.endpointForm.controls["requestName"].value);
-      console.log(this.endpointForm.value);
-
       let name = this.endpointForm.controls["requestName"].value;
       let value = this.endpointForm.controls["requestValue"].value;
 
       if (name === null || name === "" || value === null || value === "") {
         this.toastrService.warning("Cannot add a null value", "Addition error");
       } else {
-        this.requestObjArray.push({
-          name: name,
-          value: value,
-        });
-
+        this.requestObjArray.push({ name, value });
         this.dataSource = new MatTableDataSource(this.requestObjArray);
         this.endpointForm.controls["requestName"].reset();
         this.endpointForm.controls["requestValue"].reset();
-        this.toastrService.success(
-          "Request added successfully",
-          "Addition status"
-        );
+        this.toastrService.success("Request added successfully", "Addition status");
       }
     } else {
       let name = this.endpointForm.controls["rgName"].value;
@@ -321,50 +264,53 @@ export class AddEditEndpointComponent implements OnInit {
       if (name === null || name === "" || value === null || value === "") {
         this.toastrService.warning("Cannot add a null value", "Addition error");
       } else {
-        this.requestObjArray.push({
-          name: name,
-          value: value,
-        });
-
+        this.requestObjArray.push({ name, value });
         this.rgDataSource = new MatTableDataSource(this.requestObjArray);
         this.endpointForm.controls["rgName"].reset();
         this.endpointForm.controls["rgValue"].reset();
-        this.toastrService.success(
-          "Request added successfully",
-          "Addition status"
-        );
+        this.toastrService.success("Request added successfully", "Addition status");
       }
     }
   }
 
-  addHeader() {
-    console.log(this.endpointForm.controls["headerName"].value);
-    console.log(this.endpointForm.controls["headerValue"].value);
+  addJsonSnippet() {
+    try {
+      const snippet = JSON.parse(this.jsonSnippetText);
 
+      // Create an array of key-value pairs from the JSON object
+      const requestData = [
+        { name: 'channel_details', value: snippet.channel_details },
+        { name: 'payload', value: snippet.payload },
+        { name: 'txntimestamp', value: snippet.txntimestamp },
+        { name: 'xref', value: snippet.xref },
+      ];
+
+      // Add the request data to the request array
+      this.requestObjArray.push(...requestData);
+      this.dataSource = new MatTableDataSource(this.requestObjArray);
+      this.toastrService.success("JSON snippet added successfully", "Addition status");
+      this.showJsonCard = false;
+    } catch (error) {
+      this.toastrService.error("Invalid JSON format", "Addition error");
+    }
+  }
+
+  addHeader() {
     let name = this.endpointForm.controls["headerName"].value;
     let value = this.endpointForm.controls["headerValue"].value;
 
     if (name === null || name === "" || value === null || value === "") {
       this.toastrService.warning("Cannot add a null value", "Addition error");
     } else {
-      this.custHeadersArray.push({
-        name: name,
-        value: value,
-      });
-
+      this.custHeadersArray.push({ name, value });
       this.headersDataSource = new MatTableDataSource(this.custHeadersArray);
       this.endpointForm.controls["headerName"].reset();
       this.endpointForm.controls["headerValue"].reset();
-      this.toastrService.success(
-        "Header added successfully",
-        "Addition status"
-      );
+      this.toastrService.success("Header added successfully", "Addition status");
     }
   }
 
   editRequest(request: any, type: string) {
-    console.log(request);
-    console.log(request, type);
     if (type === "request" && !this.hasRequestGroup) {
       let idx = this.requestObjArray.indexOf(request);
       this.requestObjArray.splice(idx, 1);
@@ -375,7 +321,7 @@ export class AddEditEndpointComponent implements OnInit {
       this.custHeadersArray.splice(idx, 1);
       this.endpointForm.controls["headerName"].setValue(request["name"]);
       this.endpointForm.controls["headerValue"].setValue(request["value"]);
-    } else if(type === "request" && this.hasRequestGroup){
+    } else if (type === "request" && this.hasRequestGroup) {
       let idx = this.requestObjArray.indexOf(request);
       this.requestObjArray.splice(idx, 1);
       this.endpointForm.controls["rgName"].setValue(request["name"]);
@@ -386,7 +332,6 @@ export class AddEditEndpointComponent implements OnInit {
   }
 
   deleteRequest(request: any, type: string) {
-    console.log(request);
     this.popConfirmModal.confirm({
       nzTitle: `Do you want to delete this item</b>?`,
       nzContent: '<b style="color:red;">It will be permanently DELETED</b>',
@@ -400,9 +345,7 @@ export class AddEditEndpointComponent implements OnInit {
         } else if (type === "headers") {
           let idx = this.custHeadersArray.indexOf(request);
           this.custHeadersArray.splice(idx, 1);
-          this.headersDataSource = new MatTableDataSource(
-            this.custHeadersArray
-          );
+          this.headersDataSource = new MatTableDataSource(this.custHeadersArray);
         } else {
           this.toastrService.warning("Null");
         }
@@ -415,19 +358,14 @@ export class AddEditEndpointComponent implements OnInit {
   }
 
   toggleHeaders(event: Event) {
-    console.log(this.endpointForm.value);
-
     this.custHeadersFlag = !this.custHeadersFlag;
   }
 
   toggleRequestGroup(event: Event) {
-    console.log(this.endpointForm.value);
-
     this.hasRequestGroup = !this.hasRequestGroup;
   }
 
   submit() {
-    console.log(this.endpointForm.value);
     let name = this.endpointForm.controls["name"].value;
     let successField = this.endpointForm.controls["success"].value;
     let successValue = this.endpointForm.controls["successValue"].value;
@@ -467,7 +405,6 @@ export class AddEditEndpointComponent implements OnInit {
     }
 
     let successValueType = this.endpointForm.controls["successType"].value;
-
     if (successValueType === "string") {
       successValue = successValue.toString();
     } else if (successValueType === "number") {
@@ -492,8 +429,6 @@ export class AddEditEndpointComponent implements OnInit {
       },
     ];
 
-    console.log(newObj);
-
     let path = this.endpointForm.controls["path"].value;
     if (path !== "" && path !== null) {
       newObj[name]["path-suffix"] = path.toString();
@@ -511,16 +446,12 @@ export class AddEditEndpointComponent implements OnInit {
 
     let customHeaders = this.endpointForm.controls["customHeaders"].value;
     if (customHeaders !== false) {
-      console.log(this.custHeadersArray);
       let tempObj = {};
-
       this.custHeadersArray.forEach((header) => {
         tempObj[header.name] = header.value;
       });
-
       newObj[name]["custom-headers"] = tempObj;
     }
-    console.log(newObj);
 
     let tempObj = {};
     if (!this.hasRequestGroup) {
@@ -530,8 +461,6 @@ export class AddEditEndpointComponent implements OnInit {
       newObj[name]["request"] = tempObj;
     } else {
       this.requestObjArray.forEach((request) => {
-        console.log(request, "kwa rg");
-
         tempObj[request.name] = request.value;
       });
       newObj[name]["request-group"]["data"] = tempObj;
@@ -544,28 +473,14 @@ export class AddEditEndpointComponent implements OnInit {
         this.endpointForm.controls["groupBase64"].value;
     }
 
-    console.log(newObj);
-
-    console.log(this.allData);
-
     let apiMainKey: string = Object.keys(this.allData["api"])[0];
     if (this.endpointData !== undefined) {
-      console.log(
-        this.allData["api"][apiMainKey]["request-settings"]["endpoints"][
-          this.endpointData["name"]
-        ]
-      );
       delete this.allData["api"][apiMainKey]["request-settings"]["endpoints"][
         this.endpointData["name"]
       ];
-      // console.log(this.allData['api'][apiMainKey]['request-settings']['endpoints']);
       this.allData["api"][apiMainKey]["request-settings"]["endpoints"][name] = {
         ...newObj[name],
       };
-      console.log(
-        this.allData["api"][apiMainKey]["request-settings"]["endpoints"]
-      );
-
       this.toastrService.success(
         "Endpoint Updated successfully",
         "Update Status"
@@ -573,9 +488,6 @@ export class AddEditEndpointComponent implements OnInit {
     } else {
       this.allData["api"][apiMainKey]["request-settings"]["endpoints"][name] =
         newObj[name];
-      console.log(
-        this.allData["api"][apiMainKey]["request-settings"]["endpoints"]
-      );
       this.toastrService.success(
         "Endpoint Added successfully",
         "Change Status"

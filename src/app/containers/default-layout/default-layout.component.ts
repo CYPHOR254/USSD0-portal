@@ -5,7 +5,7 @@ import { Location } from "@angular/common";
 import { HttpService } from "../../shared/services/http-service.service";
 import { HandleUssdJsonService } from "../../shared/services/handle-ussd-json.service";
 import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
+import { catchError, map, take } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 
 @Component({
@@ -63,7 +63,7 @@ export class DefaultLayoutComponent implements OnInit {
   }
 
   publish() {
-    let allData = this.handleJsonData.allJsonData$.subscribe((resp) => {
+    this.handleJsonData.allJsonData$.pipe(take(1)).subscribe((resp) => {
       if (resp) {
         this.publishToRedis$ = this.httpService
           .publishToRedis("/ussd/publish-ussd", {
@@ -80,17 +80,19 @@ export class DefaultLayoutComponent implements OnInit {
                 this.handleJsonData.updatePendingPublish(false);
                 return resp;
               }
+            }),
+            catchError((error) => {
+              this.toastrService.error("Publish failed", "Error");
+              console.error(error);
+              return of(null);
             })
           );
+  
+        this.publishToRedis$.subscribe();
       }
     });
-
-    setTimeout(() => {
-      this.publishToRedis$ = of(null);
-      allData.unsubscribe();
-      this.ngOnInit();
-    }, 1000);
   }
+  
 
   changeUssdLanguage() {
     // this.allJSON["config"]["language"] = lang;

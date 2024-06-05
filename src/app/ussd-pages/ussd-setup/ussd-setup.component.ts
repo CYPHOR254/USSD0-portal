@@ -1,17 +1,9 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-} from "@angular/core";
+import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { NzModalService } from "ng-zorro-antd/modal";
 import { ToastrService } from "ngx-toastr";
 import { Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
-import { GlobalService } from "../../shared/services/global-service.service";
 import { HandleUssdJsonService } from "../../shared/services/handle-ussd-json.service";
 
 @Component({
@@ -22,218 +14,199 @@ import { HandleUssdJsonService } from "../../shared/services/handle-ussd-json.se
 })
 export class UssdSetupComponent implements OnInit {
   isLinear = false;
-  configJsonData;
-  apiJsonData;
-  languagesArray = [];
-
+  configJsonData: any;
+  languagesArray: string[] = [];
+  responseFormatsArray: string[] = ['safaricom', 'airtel', 'telkom'];
   configsFromRedis$: Observable<Record<string, string> | string>;
-  metadataKeys$: Observable<string[]>;
-  apiMetadataKeys$: Observable<string[]>;
-
-  ussdBasicDataForm: FormGroup;
-  ussdSecDataForm: FormGroup;
-
   allData$: Observable<Record<string, string>>;
   allData: Record<string, string>;
   allPages: string[];
   allPrompts: string[];
   selectedFirstTypeList: string[] = [];
-  selectedPromptList: string[] = [];
   firstPageType: string;
   errorMsg: string;
+
+  ussdBasicDataForm: FormGroup;
+  ussdSecDataForm: FormGroup;
 
   constructor(
     private router: Router,
     private handleJsonService: HandleUssdJsonService,
-    private toastrService: ToastrService // private popConfirmModal: NzModalService, // private ref: ChangeDetectorRef
+    private toastrService: ToastrService
   ) {
     this.ussdBasicDataForm = new FormGroup({
-      ussdName: new FormControl({ value: "" || "", disabled: true }, [
-        Validators.required,
-      ]),
-      language: new FormControl(),
-      loadProfile: new FormControl(),
-      authenticate: new FormControl(),
+      ussdName: new FormControl({ value: "", disabled: true }, [Validators.required]),
+      language: new FormControl('', [Validators.required]),
+      loadProfile: new FormControl(false),
+      authenticate: new FormControl(false),
+      internalAuthentication: new FormControl({ value: false, disabled: true }),
+      authenticateUsePage: new FormControl({ value: false, disabled: true }),
+      authenticateTransactions: new FormControl({ value: false, disabled: true }),
+      pinTrialMax: new FormControl(3, [Validators.required, Validators.min(1)]),
+      ussdResponseFormat: new FormControl('', [Validators.required]),
     });
 
     this.ussdSecDataForm = new FormGroup({
-      firstPageType: new FormControl(),
-      firstPage: new FormControl(),
+      firstPageType: new FormControl('', [Validators.required]),
+      firstPage: new FormControl('', [Validators.required]),
       firstPromptStep: new FormControl({ value: "", disabled: true }),
     });
   }
 
   ngOnInit(): void {
-    try {
-      this.allData$ = this.handleJsonService.allJsonData$.pipe(
-        map((resp: Record<string, string>): Record<string, string> => {
-          if (resp) {
-            this.allData = { ...resp };
-            let langArr = new Set();
+    this.allData$ = this.handleJsonService.allJsonData$.pipe(
+      map((resp: Record<string, string>): Record<string, string> => {
+        if (resp) {
+          this.allData = { ...resp };
+          let langArr = new Set<string>();
 
-            for (let key in resp) {
-              if (key === "config") {
-                this.configJsonData = resp[key];
-                this.configsFromRedis$ = of(this.configJsonData["meta-data"]);
+          for (let key in resp) {
+            if (key === "config") {
+              this.configJsonData = resp[key];
+              this.configsFromRedis$ = of(this.configJsonData["meta-data"]);
 
-                let appName = sessionStorage.getItem("appName");
-                let choosenLanguage = this.configJsonData["language"];
-                let loadProfile = this.configJsonData["do-not-load-profile"];
-                let firstPage =
-                  this.configJsonData["page-switch-check"]["options"]["client"][
-                    "page"
-                  ];
-                let authenticate = this.configJsonData["authenticate"];
-                this.firstPageType =
-                  firstPage.indexOf("page") !== -1 ? "Page" : "Prompt";
+              let appName = sessionStorage.getItem("appName");
+              let choosenLanguage = this.configJsonData["language"];
+              let loadProfile = this.configJsonData["do-not-load-profile"];
+              let authenticate = this.configJsonData["authenticate"];
+              let internalAuthentication = this.configJsonData["internal-authentication"];
+              let authenticateUsePage = this.configJsonData["authenticate-use-page"];
+              let authenticateTransactions = this.configJsonData["authenticate-transactions"];
+              let pinTrialMax = this.configJsonData["pin-trial-max"];
+              let ussdResponseFormat = this.configJsonData["ussd-response-format"];
+              let firstPage = this.configJsonData["page-switch-check"]["options"]["client"]["page"];
+              this.firstPageType = firstPage.indexOf("page") !== -1 ? "Page" : "Prompt";
 
-                this.ussdBasicDataForm.setValue({
-                  ussdName: appName,
-                  language: choosenLanguage,
-                  loadProfile: !loadProfile,
-                  authenticate: authenticate,
-                });
+              this.ussdBasicDataForm.setValue({
+                ussdName: appName,
+                language: choosenLanguage,
+                loadProfile: !loadProfile,
+                authenticate: authenticate,
+                internalAuthentication: internalAuthentication,
+                authenticateUsePage: authenticateUsePage,
+                authenticateTransactions: authenticateTransactions,
+                pinTrialMax: this.configJsonData["pin-trial-max"] || 3,
+                ussdResponseFormat: ussdResponseFormat,
+              });
 
-                this.ussdSecDataForm.setValue({
-                  firstPageType: this.firstPageType,
-                  firstPage: firstPage,
-                  firstPromptStep: firstPage,
-                });
+              this.ussdSecDataForm.setValue({
+                firstPageType: this.firstPageType,
+                firstPage: firstPage,
+                firstPromptStep: firstPage,
+              });
 
-                let pageOne =
-                  this.configJsonData["page-switch-check"]["options"]["client"][
-                    "page"
-                  ];
-                sessionStorage.setItem("pageOne", pageOne);
-              }
-
-              if (key === "language") {
-                let keys = Object.keys(this.allData[key]);
-
-                keys.map((item) => {
-                  let objLangs = Object.keys(this.allData[key][item]);
-                  objLangs.map((lang) => langArr.add(lang));
-                });
-                this.languagesArray = Array.from(langArr);
-              }
-
-              if (key === "pages") {
-                this.allPages = Object.keys(this.allData["pages"]);
-              }
-
-              if (key === "prompts") {
-                this.allPrompts = Object.keys(this.allData["prompts"]);
-              }
+              let pageOne = this.configJsonData["page-switch-check"]["options"]["client"]["page"];
+              sessionStorage.setItem("pageOne", pageOne);
             }
 
-            this.onChange(this.firstPageType);
-            return resp;
-          }
-          this.toastrService.error(
-            "USSD choosen is invalid",
-            "USSD Parsing Error"
-          );
-          this.router.navigate(["/overview"]);
-          throw new Error("No configuration files to read from!!");
-        }),
-        catchError((error) => {
-          if (error.error instanceof ErrorEvent) {
-            this.errorMsg = `Error: ${error.error.message}`;
-            this.toastrService.error(this.errorMsg, "Redis Error -Setup");
-          } else {
-            this.errorMsg = `Error: ${error.message}`;
+            if (key === "language") {
+              let keys = Object.keys(this.allData[key]);
+              keys.map(item => {
+                let objLangs = Object.keys(this.allData[key][item]);
+                objLangs.map(lang => langArr.add(lang));
+              });
+              this.languagesArray = Array.from(langArr);
+            }
 
-            this.toastrService.error(this.errorMsg, "Redis Error -Setup");
+            if (key === "pages") {
+              this.allPages = Object.keys(this.allData["pages"]);
+            }
+
+            if (key === "prompts") {
+              this.allPrompts = Object.keys(this.allData["prompts"]);
+            }
           }
-          this.router.navigate(["/overview"]);
-          return of({});
-        })
-      );
-    } catch (error) {
-      this.toastrService.error(error, "Data Loading Error");
-      this.router.navigate(["/overview"]);
+
+          this.onChange(this.firstPageType);
+          return resp;
+        }
+        this.toastrService.error("USSD chosen is invalid", "USSD Parsing Error");
+        this.router.navigate(["/overview"]);
+        throw new Error("No configuration files to read from!!");
+      }),
+      catchError((error) => {
+        if (error.error instanceof ErrorEvent) {
+          this.errorMsg = `Error: ${error.error.message}`;
+          this.toastrService.error(this.errorMsg, "Redis Error -Setup");
+        } else {
+          this.errorMsg = `Error: ${error.message}`;
+          this.toastrService.error(this.errorMsg, "Redis Error -Setup");
+        }
+        this.router.navigate(["/overview"]);
+        return of(error.message);
+      })
+    );
+  }
+
+  toggleAuth() {
+    const auth = this.ussdBasicDataForm.get('authenticate');
+    if (auth?.value) {
+      this.ussdBasicDataForm.get('internalAuthentication')?.enable();
+      this.ussdBasicDataForm.get('authenticateUsePage')?.enable();
+      this.ussdBasicDataForm.get('authenticateTransactions')?.enable();
+    } else {
+      this.ussdBasicDataForm.get('internalAuthentication')?.disable();
+      this.ussdBasicDataForm.get('authenticateUsePage')?.disable();
+      this.ussdBasicDataForm.get('authenticateTransactions')?.disable();
     }
   }
 
-  onChange(value: any) {
-    console.log(value);
-
-    let type = value;
-    this.selectedFirstTypeList = [];
-
-    if (type === "Page") {
-      this.selectedFirstTypeList = this.allPages;
-    } else if (type === "Prompt") {
-      this.selectedFirstTypeList = this.allPrompts;
+  onChange(selectedValue: string) {
+    if (selectedValue === "Page") {
+      this.selectedFirstTypeList = [...this.allPages];
+    } else {
+      this.selectedFirstTypeList = [...this.allPrompts];
     }
   }
 
   selectPromptStep(event: any) {
-    if (
-      this.ussdSecDataForm["controls"]["firstPageType"]["value"] == "Prompt"
-    ) {
-      let firstStep: any = this.allData["prompts"][event.value];
-      console.log(firstStep);
-      let item = "";
-      if (!!firstStep.length) {
-        item = firstStep[0]["name"];
-      } else {
-        item = firstStep["name"];
-      }
-      this.ussdSecDataForm.controls["firstPromptStep"].setValue(item);
-    } else {
-      this.ussdSecDataForm.controls["firstPromptStep"].setValue(event.value);
-    }
-  }
-
-  toggleAuth() {
-    let authFlag = this.ussdBasicDataForm.controls["authenticate"].value;
-
-    if (authFlag) {
-      this.selectedFirstTypeList = this.allPrompts;
-
-      this.ussdSecDataForm["controls"]["firstPageType"].setValue("Prompt");
-      this.ussdSecDataForm["controls"]["firstPage"].setValue("login");
-      this.ussdSecDataForm["controls"]["firstPromptStep"].setValue("login");
-
-      this.ussdSecDataForm["controls"]["firstPageType"].disable();
-      this.ussdSecDataForm["controls"]["firstPage"].disable();
-    } else {
-      this.ussdSecDataForm["controls"]["firstPageType"].enable();
-      this.ussdSecDataForm["controls"]["firstPage"].enable();
+    if (this.ussdSecDataForm.controls["firstPageType"].value === "Prompt") {
+      let pageName = event.value;
+      let chosenPrompt = this.allData["prompts"][pageName]["steps"][0];
+      this.ussdSecDataForm.controls["firstPromptStep"].setValue(chosenPrompt);
     }
   }
 
   submit() {
-    this.configJsonData["language"] = this.ussdBasicDataForm.controls[
-      "language"
-    ].value
-      ? this.ussdBasicDataForm.controls["language"].value
-      : this.configJsonData["language"];
+    if (this.ussdBasicDataForm.valid && this.ussdSecDataForm.valid) {
+      console.log("All data submitted", this.ussdBasicDataForm.value, this.ussdSecDataForm.value);
+      this.toastrService.success("Form submitted successfully");
 
-    this.configJsonData["do-not-load-profile"] =
-      !this.ussdBasicDataForm.controls["loadProfile"].value;
-    this.configJsonData["authenticate"] =
-      this.ussdBasicDataForm.controls["authenticate"].value;
+      this.configJsonData["language"] = this.ussdBasicDataForm.controls["language"].value
+        ? this.ussdBasicDataForm.controls["language"].value
+        : this.configJsonData["language"];
 
-    this.configJsonData["page-switch-check"]["options"]["client"]["page"] = this
-      .ussdSecDataForm.controls["firstPromptStep"].value
-      ? this.ussdSecDataForm.controls["firstPromptStep"].value
-      : this.configJsonData["page-switch-check"]["options"]["client"]["page"];
+      this.configJsonData["do-not-load-profile"] =
+        !this.ussdBasicDataForm.controls["loadProfile"].value;
+      this.configJsonData["authenticate"] =
+        this.ussdBasicDataForm.controls["authenticate"].value;
 
-    sessionStorage.setItem(
-      "pageOne",
-      this.configJsonData["page-switch-check"]["options"]["client"]["page"]
-    );
+      this.configJsonData["pin-trial-max"] = this.ussdBasicDataForm.controls["pinTrialMax"].value;
 
-    this.allData["config"] = this.configJsonData;
+      if (this.ussdSecDataForm.controls["firstPageType"].value === "Prompt") {
+        this.configJsonData["page-switch-check"]["options"]["client"]["page"] =
+          this.ussdSecDataForm.controls["firstPromptStep"].value;
+      } else {
+        this.configJsonData["page-switch-check"]["options"]["client"]["page"] =
+          this.ussdSecDataForm.controls["firstPage"].value;
+      }
 
-    this.handleJsonService.updateAllJsonData(this.allData);
+      sessionStorage.setItem(
+        "pageOne",
+        this.configJsonData["page-switch-check"]["options"]["client"]["page"]
+      );
 
-    if (this.configJsonData["do-not-load-profile"] == true) {
-      this.router.navigate(["/ussd/ussd-simulator"]);
+      this.allData["config"] = this.configJsonData;
+
+      this.handleJsonService.updateAllJsonData(this.allData);
+
+      if (this.configJsonData["do-not-load-profile"]) {
+        this.router.navigate(["/ussd/ussd-simulator"]);
+      } else {
+        this.router.navigate(["/ussd/ussd-adapter"]);
+      }
     } else {
-      this.router.navigate(["/ussd/ussd-adapter"]);
+      this.toastrService.error("Please fill all required fields", "Form Error");
     }
   }
 }

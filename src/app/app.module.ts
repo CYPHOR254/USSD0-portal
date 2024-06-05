@@ -60,6 +60,7 @@ import { AuthInterceptor } from "./shared/services/auth.interceptor";
 import { AuthGuard } from "./shared/services/auth.guard";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatBadgeModule } from "@angular/material/badge";
+// import { JsonEditorDialogComponent } from './json-editor-dialog/json-editor-dialog.component';
 registerLocaleData(en);
 
 @NgModule({
@@ -91,7 +92,7 @@ registerLocaleData(en);
     MatFormFieldModule,
     MatBadgeModule
   ],
-  declarations: [AppComponent, ...APP_CONTAINERS, P404Component, P500Component],
+  declarations: [AppComponent, ...APP_CONTAINERS, P404Component, P500Component,],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

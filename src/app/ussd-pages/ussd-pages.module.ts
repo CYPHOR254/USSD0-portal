@@ -43,7 +43,7 @@ import { AddEditLookupStatusComponent } from "./ussd-adapter/components/add-edit
 import { AddEditMapperObjComponent } from "./ussd-adapter/components/add-edit-mapper-obj/add-edit-mapper-obj.component";
 import { ListRedisDbMngtComponent } from './redis-db-mngt/list-redis-db-mngt/list-redis-db-mngt.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { AddEditRedisDbMngtComponent } from './redis-db-mngt/add-edit-redis-db-mngt/add-edit-redis-db-mngt.component';
+// import { AddEditRedisDbMngtComponent } from './redis-db-mngt/add-edit-redis-db-mngt/add-edit-redis-db-mngt.component';
 
 @NgModule({
   declarations: [
@@ -69,7 +69,7 @@ import { AddEditRedisDbMngtComponent } from './redis-db-mngt/add-edit-redis-db-m
     UssdTestingComponent,
     AddEditHostedUrlComponent,
     ListRedisDbMngtComponent,
-    AddEditRedisDbMngtComponent,
+    // AddEditRedisDbMngtComponent,
     AddEditAdapterRuleComponent,
     AddEditLookupStatusComponent,
     AddEditMapperObjComponent,
@@ -103,7 +103,7 @@ import { AddEditRedisDbMngtComponent } from './redis-db-mngt/add-edit-redis-db-m
     AddEditPromptStepComponent,
     AddusersModalComponent,
     AddEditHostedUrlComponent,
-    AddEditRedisDbMngtComponent,
+    // AddEditRedisDbMngtComponent,
     AddEditAdapterRuleComponent,
     AddEditLookupStatusComponent,
     AddEditMapperObjComponent,

@@ -1,107 +1,65 @@
 <ng-container *ngIf="allData$ | async">
-  <!-- <button
-    style="margin-bottom: 10px"
-    mat-raised-button
-    (click)="isLinear = !isLinear"
-    id="toggle-linear"
-  >
-    {{ !isLinear ? "Enable linear mode" : "Disable linear mode" }}
-  </button> -->
-
   <ng-container *ngIf="configsFromRedis$ | async as data">
-    <mat-vertical-stepper orientation="vertical" [linear]="isLinear" #stepper>
-    <mat-step [stepControl]="ussdBasicDataForm" *ngIf="ussdBasicDataForm">
-    <form [formGroup]="ussdBasicDataForm">
-      <ng-template matStepLabel
-        >Select language of your USSD application</ng-template
-      >
-
-      <section class="checkbox-section" [formGroup]="ussdBasicDataForm">
-        <p>
-          <mat-checkbox formControlName="loadProfile"
-            >Load User Profile</mat-checkbox
-          >
-        </p>
-        <p>
-          <mat-checkbox formControlName="authenticate" (change)="toggleAuth()"
-            >Authenticate</mat-checkbox
-          >
-        </p>
-      </section>
-
-      <mat-form-field appearance="fill">
-        <mat-label>Name</mat-label>
-        <input
-          matInput
-          formControlName="ussdName"
-          placeholder="xyz-ussd@0.0.1"
-        />
-      </mat-form-field>
-
-      <mat-form-field appearance="fill">
-        <mat-label>Language</mat-label>
-        <mat-select formControlName="language" name="language">
-          <mat-option *ngFor="let lang of languagesArray" [value]="lang">
-            {{ lang }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <!-- <div>
-            <button mat-raised-button color="primary" matStepperNext>Next</button>
-          </div> -->
-    </form>
-    <!-- </mat-step> -->
-    <br>
-    <!-- <mat-step [stepControl]="ussdSecDataForm" *ngIf="ussdSecDataForm"> -->
-    <form [formGroup]="ussdSecDataForm">
-      <ng-template matStepLabel>Select a default first page</ng-template>
-      <mat-form-field appearance="fill">
-        <mat-label>First Page Type</mat-label>
-        <mat-select
-          formControlName="firstPageType"
-          name="firstPageType"
-          (selectionChange)="onChange($event.value)"
-        >
-          <mat-option *ngFor="let type of ['Page', 'Prompt']" [value]="type">
-            {{ type }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field
-        appearance="fill"
-        *ngIf="selectedFirstTypeList.length > 0"
-      >
-        <mat-label>First Page/Prompt</mat-label>
-        <mat-select
-          formControlName="firstPage"
-          name="firstPage"
-          (selectionChange)="selectPromptStep($event)"
-        >
-          <mat-option *ngFor="let item of selectedFirstTypeList" [value]="item">
-            {{ item }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field
-        appearance="fill"
-        *ngIf="
-          ussdSecDataForm['controls']['firstPageType']['value'] == 'Prompt'
-        "
-      >
-        <mat-label>First Prompt Step</mat-label>
-        <input matInput formControlName="firstPromptStep" disabled />
-      </mat-form-field>
-
-      <div>
-        <button mat-raised-button color="primary" (click)="submit()">
-          Submit
-        </button>
+    <form [formGroup]="ussdBasicDataForm" (ngSubmit)="submit()">
+      <mat-vertical-stepper orientation="vertical" [linear]="isLinear" #stepper>
+        <mat-step [stepControl]="ussdBasicDataForm" *ngIf="ussdBasicDataForm">
+          <form [formGroup]="ussdBasicDataForm">
+            <ng-template matStepLabel>Select language of your USSD application</ng-template>
+            <section class="checkbox-section" [formGroup]="ussdBasicDataForm">
+              <p><mat-checkbox formControlName="loadProfile">Load User Profile</mat-checkbox></p>
+              <p><mat-checkbox formControlName="authenticate" (change)="toggleAuth()">Authenticate</mat-checkbox></p>
+              <p><mat-checkbox formControlName="internalAuthentication">Internal Authentication</mat-checkbox></p>
+              <p><mat-checkbox formControlName="authenticateUsePage">Authenticate Use Page</mat-checkbox></p>
+              <p><mat-checkbox formControlName="authenticateTransactions">Authenticate Transactions</mat-checkbox></p>
+            </section>
+            <mat-form-field appearance="fill">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="ussdName" placeholder="xyz-ussd@0.0.1" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Language</mat-label>
+              <mat-select formControlName="language" name="language">
+                <mat-option *ngFor="let lang of languagesArray" [value]="lang">{{ lang }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Pin Trial Max</mat-label>
+              <input matInput type="number" formControlName="pinTrialMax" placeholder="3" />
+            </mat-form-field>
+            
+            <mat-form-field appearance="fill">
+              <mat-label>USSD Response Format</mat-label>
+              <mat-select formControlName="ussdResponseFormat" name="ussd-response-format">
+                <mat-option *ngFor="let format of responseFormatsArray" [value]="format">{{ format }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </form>
+        </mat-step>
+        <mat-step [stepControl]="ussdSecDataForm" *ngIf="ussdSecDataForm">
+          <form [formGroup]="ussdSecDataForm">
+            <ng-template matStepLabel>Select a default first page</ng-template>
+            <mat-form-field appearance="fill">
+              <mat-label>First Page Type</mat-label>
+              <mat-select formControlName="firstPageType" name="firstPageType" (selectionChange)="onChange($event.value)">
+                <mat-option *ngFor="let type of ['Page', 'Prompt']" [value]="type">{{ type }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill" *ngIf="selectedFirstTypeList.length > 0">
+              <mat-label>First Page/Prompt</mat-label>
+              <mat-select formControlName="firstPage" name="firstPage" (selectionChange)="selectPromptStep($event)">
+                <mat-option *ngFor="let item of selectedFirstTypeList" [value]="item">{{ item }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill" *ngIf="ussdSecDataForm.controls['firstPageType'].value == 'Prompt'">
+              <mat-label>First Prompt Step</mat-label>
+              <input matInput formControlName="firstPromptStep" disabled />
+            </mat-form-field>
+          </form>
+        </mat-step>
+      </mat-vertical-stepper>
+      <div class="button-container">
+        <button type="submit" mat-raised-button color="primary" [disabled]="!ussdBasicDataForm.valid || !ussdSecDataForm.valid">Submit</button>
       </div>
     </form>
-    </mat-step>
-    </mat-vertical-stepper>
   </ng-container>
 </ng-container>

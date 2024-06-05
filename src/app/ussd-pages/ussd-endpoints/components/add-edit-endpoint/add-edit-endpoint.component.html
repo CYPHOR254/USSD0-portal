@@ -1,329 +1,248 @@
-<ng-container>
-  <h2>
-    <span>{{ formTitle }}</span>
-  </h2>
+<div class="scrollable-container">
+  <ng-container>
+    <h2>
+      <span>{{ formTitle }}</span>
+    </h2>
 
-  <section class="checkbox-section" [formGroup]="endpointForm">
-    <p>
-      <mat-checkbox
-        formControlName="customHeaders"
-        (change)="toggleHeaders($event)"
-        >Has Custom Headers</mat-checkbox
-      >
-    </p>
-    <p>
-      <mat-checkbox
-        formControlName="requestGroup"
-        (change)="toggleRequestGroup($event)"
-        >Has Request Group</mat-checkbox
-      >
-    </p>
+    <section class="checkbox-section" [formGroup]="endpointForm">
+      <p>
+        <mat-checkbox formControlName="customHeaders" (change)="toggleHeaders($event)">
+          Has Custom Headers
+        </mat-checkbox>
+      </p>
+      <p>
+        <mat-checkbox formControlName="requestGroup" (change)="toggleRequestGroup($event)">
+          Has Request Group
+        </mat-checkbox>
+      </p>
 
-    <div>
-      <button mat-raised-button color="primary" (click)="submit()">
-        Submit Endpoint Changes
-      </button>
-    </div>
-  </section>
-  <hr />
-  <mat-tab-group dynamicHeight>
-    <mat-tab label="Response Configurations">
-      <form [formGroup]="endpointForm">
-        <mat-form-field appearance="fill">
-          <mat-label>Endpoint Name</mat-label>
-          <input formControlName="name" matInput type="text" />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Success Field</mat-label>
-          <input formControlName="success" matInput type="text" />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Success Value</mat-label>
-          <input formControlName="successValue" matInput type="text" />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Success Type</mat-label>
-          <mat-select formControlName="successType">
-            <mat-option
-              *ngFor="let type of ['number', 'string', 'boolean']"
-              [value]="type"
-              >{{ type }}</mat-option
-            >
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Error Field</mat-label>
-          <input formControlName="error" matInput type="text" />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Path Suffix(optional)</mat-label>
-          <input formControlName="path" matInput type="text" />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Adapter(optional)</mat-label>
-          <input formControlName="adapter" matInput type="text" />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" *ngIf="allData$ | async">
-          <mat-label>Overide Source (optional)</mat-label>
-          <mat-select formControlName="overrideSource">
-            <mat-option
-              *ngFor="let server of serversArray"
-              [value]="server.serverName"
-              >{{ server.serverName }}</mat-option
-            >
-          </mat-select>
-        </mat-form-field>
-      </form>
-    </mat-tab>
-
-    <mat-tab label="Request Configurations" *ngIf="!hasRequestGroup">
-      <form [formGroup]="endpointForm">
-        <mat-form-field appearance="fill">
-          <mat-label>Request Name</mat-label>
-          <input formControlName="requestName" matInput type="text" />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Request Value</mat-label>
-          <input formControlName="requestValue" matInput type="text" />
-        </mat-form-field>
-
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="addRequest()"
-          class="addCustomOptionBtn"
-        >
-          Add Request
-        </button>
-      </form>
-      <hr />
-      <div class="requestTable">
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.name }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="value">
-            <th mat-header-cell *matHeaderCellDef>Value</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.value }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="action">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td
-              class="actionRow"
-              mat-cell
-              *matCellDef="let element"
-              class="action-link"
-            >
-              <button
-                mat-icon-button
-                matTooltip="Edit"
-                (click)="editRequest(element, 'request')"
-              >
-                <mat-icon class="edit">edit</mat-icon>
-              </button>
-
-              <button
-                mat-icon-button
-                matTooltip="Delete"
-                (click)="deleteRequest(element, 'request')"
-              >
-                <mat-icon class="delete">delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-          ></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+      <div>
+        <button mat-raised-button color="primary" (click)="submit()">Submit Endpoint Changes</button>
       </div>
-    </mat-tab>
-    
-    <mat-tab label="Request Group Config" *ngIf="hasRequestGroup">
-      <form [formGroup]="endpointForm">     
-        <mat-form-field appearance="fill">
-          <mat-label>Group To</mat-label>
-          <input formControlName="groupTo" matInput type="text" />
-        </mat-form-field>
-       
-        <mat-form-field appearance="fill">
-          <mat-label>Group Format</mat-label>
-          <input formControlName="groupFormat" matInput type="text" />
-        </mat-form-field>
-       
-        <mat-form-field appearance="fill">
-          <mat-label>Group Base64</mat-label>
-          <input formControlName="groupBase64" matInput type="text" />
-        </mat-form-field>
+    </section>
+    <hr />
+    <mat-tab-group dynamicHeight>
+      <mat-tab label="Response Configurations">
+        <form [formGroup]="endpointForm">
+          <mat-form-field appearance="fill">
+            <mat-label>Endpoint Name</mat-label>
+            <input formControlName="name" matInput type="text" />
+          </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>RG Name</mat-label>
-          <input formControlName="rgName" matInput type="text" />
-        </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Success Field</mat-label>
+            <input formControlName="success" matInput type="text" />
+          </mat-form-field>
 
+          <mat-form-field appearance="fill">
+            <mat-label>Success Value</mat-label>
+            <input formControlName="successValue" matInput type="text" />
+          </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>RG Value</mat-label>
-          <input formControlName="rgValue" matInput type="text" />
-        </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Success Type</mat-label>
+            <mat-select formControlName="successType">
+              <mat-option *ngFor="let type of ['number', 'string', 'boolean']" [value]="type">{{ type }}</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="addRequest()"
-          class="addCustomOptionBtn"
-        >
-          Add Request
-        </button>
-      </form>
-      <hr />
-      <div class="requestTable">
-        <table mat-table [dataSource]="rgDataSource" class="mat-elevation-z8">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.name }}
-            </td>
-          </ng-container>
+          <mat-form-field appearance="fill">
+            <mat-label>Error Field</mat-label>
+            <input formControlName="error" matInput type="text" />
+          </mat-form-field>
 
-          <ng-container matColumnDef="value">
-            <th mat-header-cell *matHeaderCellDef>Value</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.value }}
-            </td>
-          </ng-container>
+          <mat-form-field appearance="fill">
+            <mat-label>Path Suffix(optional)</mat-label>
+            <input formControlName="path" matInput type="text" />
+          </mat-form-field>
 
-          <ng-container matColumnDef="action">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td
-              class="actionRow"
-              mat-cell
-              *matCellDef="let element"
-              class="action-link"
-            >
-              <button
-                mat-icon-button
-                matTooltip="Edit"
-                (click)="editRequest(element, 'request')"
-              >
-                <mat-icon class="edit">edit</mat-icon>
-              </button>
+          <mat-form-field appearance="fill">
+            <mat-label>Adapter(optional)</mat-label>
+            <input formControlName="adapter" matInput type="text" />
+          </mat-form-field>
 
-              <button
-                mat-icon-button
-                matTooltip="Delete"
-                (click)="deleteRequest(element, 'request')"
-              >
-                <mat-icon class="delete">delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
+          <mat-form-field appearance="fill" *ngIf="allData$ | async">
+            <mat-label>Override Source (optional)</mat-label>
+            <mat-select formControlName="overrideSource">
+              <mat-option *ngFor="let server of serversArray" [value]="server.serverName">{{ server.serverName }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+      </mat-tab>
 
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-          ></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-      </div>
-    </mat-tab>
+      <mat-tab label="Request Configurations" *ngIf="!hasRequestGroup">
+        <form [formGroup]="endpointForm">
+          <mat-form-field appearance="fill">
+            <mat-label>Request Name</mat-label>
+            <input formControlName="requestName" matInput type="text" />
+          </mat-form-field>
 
-    <mat-tab label="Headers Configurations" *ngIf="custHeadersFlag === true">
-      <form [formGroup]="endpointForm">
-        <mat-form-field appearance="fill">
-          <mat-label>Header Name</mat-label>
-          <mat-select formControlName="headerName">
-            <mat-option *ngFor="let header of headersArray" [value]="header">{{
-              header
-            }}</mat-option>
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Request Value</mat-label>
+            <input formControlName="requestValue" matInput type="text" />
+          </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Header Value</mat-label>
-          <input formControlName="headerValue" matInput type="text" />
-        </mat-form-field>
+          <button mat-raised-button color="primary" (click)="addRequest()" class="addCustomOptionBtn">Add Request</button>
+        </form>
+        <hr />
+        <div class="requestTable">
+          <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+            </ng-container>
 
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="addHeader()"
-          class="addCustomOptionBtn"
-        >
-          Add Header
-        </button>
-      </form>
-      <hr />
-      <div class="headersTable">
-        <table
-          mat-table
-          [dataSource]="headersDataSource"
-          class="mat-elevation-z8"
-        >
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.name }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef>Value</th>
+              <td mat-cell *matCellDef="let element">{{ element.value | json }}</td>
+            </ng-container>
 
-          <ng-container matColumnDef="value">
-            <th mat-header-cell *matHeaderCellDef>Value</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.value }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let element" class="action-link">
+                <button mat-icon-button matTooltip="Edit" (click)="editRequest(element, 'request')">
+                  <mat-icon class="edit">edit</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Delete" (click)="deleteRequest(element, 'request')">
+                  <mat-icon class="delete">delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="action">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td
-              class="actionRow"
-              mat-cell
-              *matCellDef="let element"
-              class="action-link"
-            >
-              <button
-                mat-icon-button
-                matTooltip="Edit"
-                (click)="editRequest(element, 'headers')"
-              >
-                <mat-icon class="edit">edit</mat-icon>
-              </button>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
 
-              <button
-                mat-icon-button
-                matTooltip="Delete"
-                (click)="deleteRequest(element, 'headers')"
-              >
-                <mat-icon class="delete">delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
+        <div>
+          <button mat-raised-button color="primary" (click)="showJsonCard = !showJsonCard">
+            Toggle JSON Snippet
+          </button>
+        </div>
 
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-          ></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-</ng-container>
+        <div *ngIf="showJsonCard" class="json-card">
+          <mat-card class="json-card-content">
+            <mat-card-title>Edit JSON Snippet</mat-card-title>
+            <mat-card-content>
+              <textarea [(ngModel)]="jsonSnippetText" rows="10" cols="50" class="json-textarea"></textarea>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-raised-button color="primary" (click)="addJsonSnippet()">Submit JSON Snippet</button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+
+        <!-- <div>
+          <button mat-raised-button color="primary" (click)="submit()">Submit Endpoint Changes</button>
+        </div> -->
+      </mat-tab>
+
+      <mat-tab label="Request Group Config" *ngIf="hasRequestGroup">
+        <form [formGroup]="endpointForm">
+          <mat-form-field appearance="fill">
+            <mat-label>Group To</mat-label>
+            <input formControlName="groupTo" matInput type="text" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Group Format</mat-label>
+            <input formControlName="groupFormat" matInput type="text" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Group Base64</mat-label>
+            <input formControlName="groupBase64" matInput type="text" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>RG Name</mat-label>
+            <input formControlName="rgName" matInput type="text" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>RG Value</mat-label>
+            <input formControlName="rgValue" matInput type="text" />
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="addRequest()" class="addCustomOptionBtn">Add Request</button>
+        </form>
+        <hr />
+        <div class="requestTable">
+          <table mat-table [dataSource]="rgDataSource" class="mat-elevation-z8">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef>Value</th>
+              <td mat-cell *matCellDef="let element">{{ element.value }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let element" class="action-link">
+                <button mat-icon-button matTooltip="Edit" (click)="editRequest(element, 'request')">
+                  <mat-icon class="edit">edit</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Delete" (click)="deleteRequest(element, 'request')">
+                  <mat-icon class="delete">delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Headers Configurations" *ngIf="custHeadersFlag === true">
+        <form [formGroup]="endpointForm">
+          <mat-form-field appearance="fill">
+            <mat-label>Header Name</mat-label>
+            <mat-select formControlName="headerName">
+              <mat-option *ngFor="let header of headersArray" [value]="header">{{ header }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Header Value</mat-label>
+            <input formControlName="headerValue" matInput type="text" />
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="addHeader()" class="addCustomOptionBtn">Add Header</button>
+        </form>
+        <hr />
+        <div class="headersTable">
+          <table mat-table [dataSource]="headersDataSource" class="mat-elevation-z8">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef>Value</th>
+              <td mat-cell *matCellDef="let element">{{ element.value }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let element" class="action-link">
+                <button mat-icon-button matTooltip="Edit" (click)="editRequest(element, 'headers')">
+                  <mat-icon class="edit">edit</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Delete" (click)="deleteRequest(element, 'headers')">
+                  <mat-icon class="delete">delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </ng-container>
+</div>
