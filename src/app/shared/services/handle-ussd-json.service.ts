@@ -5,6 +5,9 @@ import { BehaviorSubject } from "rxjs";
   providedIn: "root",
 })
 export class HandleUssdJsonService {
+  getJsonSnippet() {
+    throw new Error("Method not implemented.");
+  }
   private allJsonDataBehvSubj = new BehaviorSubject<Record<string, string>>({});
   public allJsonData$ = this.allJsonDataBehvSubj.asObservable();
   

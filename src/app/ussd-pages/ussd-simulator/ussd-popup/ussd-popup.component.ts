@@ -92,12 +92,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // this.dialog.closeAll();
-    // this.dialog.afterAllClosed.subscribe(() => {
-    //   this.fetchExistingData();
-    //   this.updatePhoneDisplay();
-    //   this.ref.detectChanges();
-    // });
     this.fetchExistingData();
     this.updatePhoneDisplay();
   }
@@ -116,12 +110,9 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
           let pagesKeys: string[] = Object.keys(this.allJSON["pages"]);
           let promptsKeys: string[] = Object.keys(this.allJSON["prompts"]);
 
-          console.log(pageOne, "asdjhasgjhas");
-
           pagesKeys.map((key: string) => {
             if (key === pageOne) {
               let pageOneData = this.allJSON["pages"][pageOne];
-
               this.ussdSimulatorService.updateUssdDisplayPageState(pageOneData);
             }
           });
@@ -129,28 +120,7 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
           promptsKeys.map((key: string) => {
             if (key === pageOne) {
               let pageOneData = this.allJSON["prompts"][pageOne];
-              // let next;
-              // console.log(pageOneData, 'sahgashdjasgdash', !!pageOneData.length);
-
-              // if (!!pageOneData.length === false) {
-              //   next = pageOneData["next"]
-              //   ? pageOneData["next"]
-              //   : pageOneData["external-fetch"]["success"] ||
-              //   pageOneData["internal-fetch"]["success"];
-              //   console.log(next, 'asdda');
-              // } else {
-              //   next = pageOneData[0]["next"]
-              //   ? pageOneData[0]["next"]
-              //   : pageOneData[0]["external-fetch"]["success"] ||
-              //   pageOneData[0]["internal-fetch"]["success"];
-              //   console.log(next, 'asdasdasd else');
-              // }
-              // pageOneData = this.allJSON["pages"][next];
-              // console.log(pageOneData, 'asdasdasd');
-              // this.ussdSimulatorService.updateUssdDisplayPageState(pageOneData);
-              this.ussdSimulatorService.updateUssdDisplayPromptState(
-                pageOneData
-              );
+              this.ussdSimulatorService.updateUssdDisplayPromptState(pageOneData);
               this.isPrompt = true;
               this.currentPrompt = pageOneData[0]["name"];
               this.updatePhoneDisplay();
@@ -163,11 +133,9 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
       catchError((error) => {
         if (error.error instanceof ErrorEvent) {
           this.errorMsg = `Error: ${error.error.message}`;
-
           this.toastrService.error(this.errorMsg, "Redis Error");
         } else {
           this.errorMsg = `Error: ${error.message}`;
-
           this.toastrService.error(this.errorMsg, "Redis Error");
         }
         this.router.navigate(["/ussd/ussd-setup"]);
@@ -180,8 +148,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
     if (this.isPrompt === false) {
       this.response$ = this.ussdSimulatorService.currentDisplayPageData$.pipe(
         map((item) => {
-          console.log(item, "This is the item from popus component");
-
           if (item) {
             this.currentPageData = { ...item };
 
@@ -232,7 +198,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
                 displayLabel === undefined
                   ? this.handleJsonData.getKeyFromLang(
                       this.allJSON,
-
                       option.label
                     )
                   : displayLabel;
@@ -277,8 +242,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
         this.ussdSimulatorService.currentDisplayPromptData$.pipe(
           map((item) => {
             if (item) {
-              console.log(item, "<><><><><>");
-
               let resp = item;
               let tempArr = [];
 
@@ -296,7 +259,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
                   } else {
                     prompt.title = promptText;
                   }
-                  console.log(prompt);
                 });
               } else if (item.length === 0) {
                 this.currentPromptTitle = "Please add a new step";
@@ -315,8 +277,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
               }
 
               this.currentPromptTitle = tempArr[0]["name"];
-              console.log(tempArr, "tempArr");
-
               return tempArr;
             }
             throw new Error("Could not get prompt data");
@@ -324,11 +284,9 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
           catchError((error) => {
             if (error.error instanceof ErrorEvent) {
               this.errorMsg = `Error: ${error.error.message}`;
-
               this.toastrService.error(this.errorMsg, "Redis Error");
             } else {
               this.errorMsg = `Error: ${error.message}`;
-
               this.toastrService.error(this.errorMsg, "Redis Error");
             }
             return of([]);
@@ -371,7 +329,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
       try {
         const selectedOption =
           this.currentPageData.options[selectedValue]["name"];
-        console.log(idx, selectedOption);
 
         if (
           selectedOption.includes("page") &&
@@ -417,7 +374,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
         this.ref.detectChanges();
       }
     }
-    // this.ussdForm.reset();
   }
 
   goBack() {
@@ -448,11 +404,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
       width: "fit-content",
       position: { right: "80px" },
     });
-
-    // this.dialog.afterAllClosed.subscribe(() => {
-    //   this.updatePhoneDisplay();
-    //   this.ref.detectChanges();
-    // });
   }
 
   editPrompt(prompt?: Record<string, string>) {
@@ -469,7 +420,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
       .afterClosed()
       .subscribe((resp) => {
         if (resp !== true) {
-          // this.fetchExistingData();
           this.updatePhoneDisplay();
           this.ref.detectChanges();
         }
@@ -479,14 +429,7 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
   }
 
   deletePrompt(prompt?: Record<string, string>) {
-    console.log(this.currentPrompt);
-    console.log(this.allJSON["prompts"][this.currentPrompt]);
-
     let idx = this.allJSON["prompts"][this.currentPrompt].indexOf(prompt);
-    console.log(idx);
-
-    // this.allJSON['prompts'][this.currentPrompt].splice(idx, 1);
-    // console.log(this.allJSON['prompts'][this.currentPrompt]);
 
     this.popConfirmModal.confirm({
       nzTitle: `Do you want to delete <b style="color:red;">${prompt.name}</b>?`,
@@ -501,13 +444,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
         let idx2 =
           this.allJSON["prompts_cache"][this.currentPrompt].indexOf(prompt);
         this.allJSON["prompts_cache"][this.currentPrompt].splice(idx2, 1);
-
-        // this.allJSON["prompts"][this.currentPrompt] = Object.assign(
-        //   { ... this.allJSON["prompts"][this.currentPrompt] },
-        //   {
-        //     options: this.currentPageData.options,
-        //   }
-        // );
 
         this.handleJsonData.updateAllJsonData(this.allJSON);
 
@@ -567,8 +503,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
           this.fetchExistingData();
           this.updatePhoneDisplay();
           this.ref.detectChanges();
-          this.simulateSuccLogin()
-
         }
       });
   }
@@ -595,7 +529,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
     let loginPrompt = this.allJSON["prompts"]["login"][length - 1];
     let nextStep = loginPrompt["external-fetch"]["success"];
 
-    console.log(nextStep);
     if (nextStep.includes("-page")) {
       this.isPrompt = false;
       this.ussdSimulatorService.updateUssdDisplayPageState(
@@ -607,7 +540,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
         this.allJSON,
         nextStep
       );
-      console.log(mainPrompt);
 
       this.ussdSimulatorService.updateUssdDisplayPromptState(
         this.allJSON["prompts"][mainPrompt]
@@ -646,7 +578,6 @@ export class UssdPopupComponent implements OnInit, OnDestroy {
         );
 
         this.ref.detectChanges();
-          this.simulateSuccLogin()
         this.toastrService.success(
           `Option ${ussdOption} removed successfully`,
           "Removal Status"

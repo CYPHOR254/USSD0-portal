@@ -41,7 +41,7 @@ import { AddEditHostedUrlComponent } from "./ussd-testing/components/add-edit-ho
 import { AddEditAdapterRuleComponent } from "./ussd-adapter/components/add-edit-adapter-rule/add-edit-adapter-rule.component";
 import { AddEditLookupStatusComponent } from "./ussd-adapter/components/add-edit-lookup-status/add-edit-lookup-status.component";
 import { AddEditMapperObjComponent } from "./ussd-adapter/components/add-edit-mapper-obj/add-edit-mapper-obj.component";
-import { ListRedisDbMngtComponent } from './redis-db-mngt/list-redis-db-mngt/list-redis-db-mngt.component';
+// import { ListRedisDbMngtComponent } from './redis-db-mngt/list-redis-db-mngt/list-redis-db-mngt.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 // import { AddEditRedisDbMngtComponent } from './redis-db-mngt/add-edit-redis-db-mngt/add-edit-redis-db-mngt.component';
 
@@ -68,7 +68,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
     UssdAdapterComponent,
     UssdTestingComponent,
     AddEditHostedUrlComponent,
-    ListRedisDbMngtComponent,
+    // ListRedisDbMngtComponent,
     // AddEditRedisDbMngtComponent,
     AddEditAdapterRuleComponent,
     AddEditLookupStatusComponent,

@@ -11,7 +11,7 @@ import { UssdPromptsComponent } from "./ussd-prompts/ussd-prompts.component";
 import { UssdPagesComponent } from "./ussd-pages/ussd-pages.component";
 import { UssdAdapterComponent } from "./ussd-adapter/ussd-adapter.component";
 import { UssdTestingComponent } from "./ussd-testing/ussd-testing.component";
-import { ListRedisDbMngtComponent } from "./redis-db-mngt/list-redis-db-mngt/list-redis-db-mngt.component";
+// import { ListRedisDbMngtComponent } from "./redis-db-mngt/list-redis-db-mngt/list-redis-db-mngt.component";
 
 const routes: Routes = [
   {
@@ -69,13 +69,13 @@ const routes: Routes = [
       title: 'list-users'
     }
   },
-  {
-    path: 'redis-db-mngt',
-    component: ListRedisDbMngtComponent,
-    data: {
-      title: 'redis-db-mngt'
-    }
-  },
+  // {
+  //   path: 'redis-db-mngt',
+  //   component: ListRedisDbMngtComponent,
+  //   data: {
+  //     title: 'redis-db-mngt'
+  //   }
+  // },
   {
     path: "ussd-prompts",
     component: UssdPromptsComponent,

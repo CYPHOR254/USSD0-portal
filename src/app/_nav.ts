@@ -82,18 +82,18 @@ export const navItems: INavData[] = [
       // },
     ],
   },
-  {
-    name: "Redis db Mngt",
-    url: "/ussd/redis-db-mngt",
-    icon: "icon-speedometer",
-    children: [
-      {
-        name: "Redis db Mngt",
-        url: "/ussd/redis-db-mngt",
-        icon: "icon-screen-smartphone",
-      }
-    ]
-  },
+  // {
+  //   name: "Redis db Mngt",
+  //   url: "/ussd/redis-db-mngt",
+  //   icon: "icon-speedometer",
+  //   children: [
+  //     {
+  //       name: "Redis db Mngt",
+  //       url: "/ussd/redis-db-mngt",
+  //       icon: "icon-screen-smartphone",
+  //     }
+  //   ]
+  // },
 
   // {
   //   name: 'USSD Module',

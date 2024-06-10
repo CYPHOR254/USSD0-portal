@@ -54,10 +54,10 @@ export class AddEditEndpointComponent implements OnInit {
         "deviceId": "1cc2a3a5559835b1"
     },
     "payload": {
-        "phoneNumber": "254795881812"
+        "phoneNumber": "254759432206"
     },
-    "txntimestamp": "2024-03-22T13:00:26",
-    "xref": "130026"
+    "txntimestamp": "create:timeStamp=YYYY-MM-DDTHH.mm.ss",
+    "xref": "create:timeStamp=HHmmss"
   }`;
 
   constructor(

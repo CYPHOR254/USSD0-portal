@@ -2,12 +2,24 @@
   margin-top: 10px;
 }
 
-.checkbox-section{
+.checkbox-section {
   justify-content: flex-start !important;
 }
-
 
 .button-container {
   margin-top: 20px;
   text-align: center;
+}
+mat-card {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.checkbox-section {
+  margin-bottom: 20px;
+}
+
+.button-container {
+  text-align: right;
 }

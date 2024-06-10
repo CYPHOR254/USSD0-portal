@@ -63,6 +63,8 @@ export class UssdEndpointsComponent implements OnInit {
           if (resp) {
             this.allData = { ...resp };
             this.apiJsonData = resp["api"];
+            console.log(this.apiJsonData);
+            
             this.configsFromRedis$ = of(this.apiJsonData);
 
             let apiMainKey: string = Object.keys(this.apiJsonData)[0];
